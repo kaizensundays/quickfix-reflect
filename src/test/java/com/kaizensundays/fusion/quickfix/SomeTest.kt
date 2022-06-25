@@ -45,8 +45,6 @@ class SomeTest {
 
     }
 
-    fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
-
     @Test
     fun reflect() {
 
