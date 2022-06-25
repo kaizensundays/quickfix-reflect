@@ -2,8 +2,13 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import quickfix.Message
+import quickfix.field.MsgType
 import quickfix.field.OrderQty
+import quickfix.field.SenderCompID
+import quickfix.field.Side
 import quickfix.field.Symbol
+import quickfix.field.TargetCompID
+import java.lang.reflect.Field
 
 /**
  * Created: Saturday 6/25/2022, 12:32 PM Eastern Time
@@ -12,17 +17,48 @@ import quickfix.field.Symbol
  */
 class GenericFixMessageConverter : ObjectConverter<Message, FixMessage> {
 
+    val nameToTagMap = mapOf(
+        "MsgType" to MsgType.FIELD,
+        "SenderCompID" to SenderCompID.FIELD,
+        "TargetCompID" to TargetCompID.FIELD,
+        "Side" to Side.FIELD,
+        "OrderQty" to OrderQty.FIELD,
+        "Symbol" to Symbol.FIELD,
+    )
+
+    fun Message.set(field: Field, obj: FixMessage) {
+
+        val tag = nameToTagMap[field.name.firstCharToUpper()]
+        if (tag != null) {
+            when (field.type) {
+                Character::class.java -> {
+                    this.setChar(tag, field.get(obj) as Char)
+                }
+                String::class.java -> {
+                    this.setString(tag, field.get(obj) as String)
+                }
+                java.lang.Double::class.java -> {
+                    this.setDouble(tag, field.get(obj) as Double)
+                }
+            }
+        }
+    }
+
     override fun fromObject(obj: FixMessage): Message {
 
         val fieldMap = obj.javaClass.fields.map { f -> f.name.firstCharToUpper() to f }.toMap()
 
         val msg = Message()
 
-        val orderQty = fieldMap["OrderQty"]?.get(obj) as Double
-        msg.setDouble(OrderQty.FIELD, orderQty)
+        val names = fieldMap.map { entry -> entry.key }
 
-        val symbol = fieldMap["Symbol"]?.get(obj) as String
-        msg.setString(Symbol.FIELD, symbol)
+        names.forEach { name ->
+
+            val f = fieldMap[name]
+            if (f != null) {
+                msg.set(f, obj)
+            }
+        }
 
         return msg
     }
