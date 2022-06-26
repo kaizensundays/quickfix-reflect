@@ -45,35 +45,29 @@ class GenericFixMessageConverter : ObjectConverter<Message, FixMessage> {
         }
     }
 
+    fun FieldMap.setFields(type: Class<*>, obj: FixMessage) {
+
+        val fieldMap = type.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
+
+        val names = fieldMap.map { entry -> entry.key }
+
+        names.forEach { name ->
+
+            val f = fieldMap[name]
+            if (f != null) {
+                this.set(f, obj)
+            }
+        }
+
+    }
+
     override fun fromObject(obj: FixMessage): Message {
 
         val msg = Message()
 
-        // header
-        var fieldMap = FixMessage::class.java.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
+        msg.header.setFields(FixMessage::class.java, obj)
 
-        var names = fieldMap.map { entry -> entry.key }
-
-        names.forEach { name ->
-
-            val f = fieldMap[name]
-            if (f != null) {
-                msg.header.set(f, obj)
-            }
-        }
-
-        // message body
-        fieldMap = obj.javaClass.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
-
-        names = fieldMap.map { entry -> entry.key }
-
-        names.forEach { name ->
-
-            val f = fieldMap[name]
-            if (f != null) {
-                msg.set(f, obj)
-            }
-        }
+        msg.setFields(obj.javaClass, obj)
 
         return msg
     }
