@@ -9,6 +9,7 @@ public abstract class FixMessage {
 
     public final String msgType;
 
+    public String beginString;
     public String senderCompID;
     public String targetCompID;
 

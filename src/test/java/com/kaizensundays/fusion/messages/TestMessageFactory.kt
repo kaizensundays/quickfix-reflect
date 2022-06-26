@@ -2,6 +2,7 @@ package com.kaizensundays.fusion.messages
 
 import com.kaizensundays.fusion.quickfix.messages.NewOrderSingle
 import com.kaizensundays.fusion.quickfix.toEpochMilli
+import quickfix.FixVersions
 import java.time.LocalDateTime
 
 /**
@@ -13,6 +14,7 @@ class TestMessageFactory {
 
     fun newOrderSingle(side: Char, orderQty: Double, symbol: String): NewOrderSingle {
         val obj = NewOrderSingle()
+        obj.beginString = FixVersions.BEGINSTRING_FIX44
         obj.senderCompID = "IB"
         obj.targetCompID = "CBOE"
         obj.side = side

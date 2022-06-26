@@ -4,6 +4,7 @@ import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import quickfix.Message
+import quickfix.field.BeginString
 import quickfix.field.MaturityMonthYear
 import quickfix.field.MsgType
 import quickfix.field.OrderQty
@@ -22,6 +23,7 @@ import java.lang.reflect.Field
 class GenericFixMessageConverter : ObjectConverter<Message, FixMessage> {
 
     val nameToTagMap = mapOf(
+        "BeginString" to BeginString.FIELD,
         "MsgType" to MsgType.FIELD,
         "SenderCompID" to SenderCompID.FIELD,
         "TargetCompID" to TargetCompID.FIELD,

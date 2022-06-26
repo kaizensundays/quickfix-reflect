@@ -2,6 +2,7 @@ package com.kaizensundays.fusion.messages
 
 import com.kaizensundays.fusion.quickfix.messages.GenericFixMessageConverter
 import org.junit.Test
+import quickfix.field.BeginString
 import quickfix.field.MaturityMonthYear
 import quickfix.field.MsgType
 import quickfix.field.OrderQty
@@ -35,6 +36,7 @@ class GenericFixMessageConverterTest {
         objs.forEachIndexed { i, obj ->
             val msg = converter.fromObject(obj)
 
+            assertEquals(objs[i].beginString, msg.header.getString(BeginString.FIELD))
             assertEquals(objs[i].msgType, msg.header.getString(MsgType.FIELD))
             assertEquals(objs[i].senderCompID, msg.header.getString(SenderCompID.FIELD))
             assertEquals(objs[i].targetCompID, msg.header.getString(TargetCompID.FIELD))
