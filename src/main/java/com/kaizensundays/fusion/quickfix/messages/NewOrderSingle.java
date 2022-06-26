@@ -12,6 +12,8 @@ public class NewOrderSingle extends FixMessage {
     public Character side;
     public Double orderQty;
     public String symbol;
+    public Long maturityMonthYear;
+    public Long transactTime;
 
     public NewOrderSingle() {
         super(MsgType.ORDER_SINGLE);

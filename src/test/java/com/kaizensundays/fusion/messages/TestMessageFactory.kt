@@ -1,6 +1,8 @@
 package com.kaizensundays.fusion.messages
 
 import com.kaizensundays.fusion.quickfix.messages.NewOrderSingle
+import com.kaizensundays.fusion.quickfix.toEpochMilli
+import java.time.LocalDateTime
 
 /**
  * Created: Saturday 6/25/2022, 12:35 PM Eastern Time
@@ -16,6 +18,8 @@ class TestMessageFactory {
         obj.side = side
         obj.orderQty = orderQty
         obj.symbol = symbol
+        obj.maturityMonthYear = 20220715
+        obj.transactTime = toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
         return obj;
     }
 

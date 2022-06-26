@@ -1,14 +1,17 @@
 package com.kaizensundays.fusion.quickfix.messages
 
 import com.kaizensundays.fusion.quickfix.firstCharToUpper
+import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import quickfix.Message
+import quickfix.field.MaturityMonthYear
 import quickfix.field.MsgType
 import quickfix.field.OrderQty
 import quickfix.field.SenderCompID
 import quickfix.field.Side
 import quickfix.field.Symbol
 import quickfix.field.TargetCompID
+import quickfix.field.TransactTime
 import java.lang.reflect.Field
 
 /**
@@ -25,6 +28,13 @@ class GenericFixMessageConverter : ObjectConverter<Message, FixMessage> {
         "Side" to Side.FIELD,
         "OrderQty" to OrderQty.FIELD,
         "Symbol" to Symbol.FIELD,
+        "MaturityMonthYear" to MaturityMonthYear.FIELD,
+        "TransactTime" to TransactTime.FIELD,
+    )
+
+    val tagToTypeMap = mapOf(
+        MaturityMonthYear.FIELD to "INT",
+        TransactTime.FIELD to "UTCTIMESTAMP",
     )
 
     fun FieldMap.set(field: Field, obj: FixMessage) {
@@ -40,6 +50,18 @@ class GenericFixMessageConverter : ObjectConverter<Message, FixMessage> {
                 }
                 java.lang.Double::class.java -> {
                     this.setDouble(tag, field.get(obj) as Double)
+                }
+                java.lang.Long::class.java -> {
+                    val fixType = tagToTypeMap[tag]
+                    when (fixType) {
+                        "UTCTIMESTAMP" -> {
+                            val timestamp = field.get(obj) as Long
+                            this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
+                        }
+                        "INT" -> {
+                            this.setInt(tag, (field.get(obj) as Long).toInt())
+                        }
+                    }
                 }
             }
         }

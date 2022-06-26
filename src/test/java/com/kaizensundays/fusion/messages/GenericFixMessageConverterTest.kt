@@ -2,12 +2,14 @@ package com.kaizensundays.fusion.messages
 
 import com.kaizensundays.fusion.quickfix.messages.GenericFixMessageConverter
 import org.junit.Test
+import quickfix.field.MaturityMonthYear
 import quickfix.field.MsgType
 import quickfix.field.OrderQty
 import quickfix.field.SenderCompID
 import quickfix.field.Side
 import quickfix.field.Symbol
 import quickfix.field.TargetCompID
+import quickfix.field.TransactTime
 import kotlin.test.assertEquals
 
 /**
@@ -40,6 +42,9 @@ class GenericFixMessageConverterTest {
             assertEquals(objs[i].side, msg.getChar(Side.FIELD))
             assertEquals(objs[i].orderQty, msg.getDouble(OrderQty.FIELD))
             assertEquals(objs[i].symbol, msg.getString(Symbol.FIELD))
+
+            assertEquals(objs[i].maturityMonthYear.toInt(), msg.getInt(MaturityMonthYear.FIELD))
+            assertEquals("2022-07-03T17:11:03", msg.getUtcTimeStamp(TransactTime.FIELD).toString())
         }
 
     }
