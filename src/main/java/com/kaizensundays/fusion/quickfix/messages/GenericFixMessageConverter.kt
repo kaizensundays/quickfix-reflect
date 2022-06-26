@@ -1,6 +1,7 @@
 package com.kaizensundays.fusion.quickfix.messages
 
 import com.kaizensundays.fusion.quickfix.firstCharToUpper
+import quickfix.FieldMap
 import quickfix.Message
 import quickfix.field.MsgType
 import quickfix.field.OrderQty
@@ -26,7 +27,7 @@ class GenericFixMessageConverter : ObjectConverter<Message, FixMessage> {
         "Symbol" to Symbol.FIELD,
     )
 
-    fun Message.set(field: Field, obj: FixMessage) {
+    fun FieldMap.set(field: Field, obj: FixMessage) {
 
         val tag = nameToTagMap[field.name.firstCharToUpper()]
         if (tag != null) {
@@ -46,11 +47,25 @@ class GenericFixMessageConverter : ObjectConverter<Message, FixMessage> {
 
     override fun fromObject(obj: FixMessage): Message {
 
-        val fieldMap = obj.javaClass.fields.map { f -> f.name.firstCharToUpper() to f }.toMap()
-
         val msg = Message()
 
-        val names = fieldMap.map { entry -> entry.key }
+        // header
+        var fieldMap = FixMessage::class.java.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
+
+        var names = fieldMap.map { entry -> entry.key }
+
+        names.forEach { name ->
+
+            val f = fieldMap[name]
+            if (f != null) {
+                msg.header.set(f, obj)
+            }
+        }
+
+        // message body
+        fieldMap = obj.javaClass.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
+
+        names = fieldMap.map { entry -> entry.key }
 
         names.forEach { name ->
 
