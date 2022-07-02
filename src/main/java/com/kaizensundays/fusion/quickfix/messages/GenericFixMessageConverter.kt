@@ -11,12 +11,16 @@ import java.lang.reflect.Field
  *
  * @author Sergey Chuykov
  */
+typealias FixFieldSetter = FieldMap.(Int, Field, FixMessage) -> Unit
+
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
+    val charSetter: FixFieldSetter = { tag, field, obj ->
+        this.setChar(tag, field.get(obj) as Char)
+    }
+
     val fixFieldSettersMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: FixMessage) -> Unit> = mapOf(
-        Character::class.java to { tag, field, obj ->
-            this.setChar(tag, field.get(obj) as Char)
-        },
+        Character::class.java to charSetter,
         String::class.java to { tag, field, obj ->
             this.setString(tag, field.get(obj) as String)
         },
