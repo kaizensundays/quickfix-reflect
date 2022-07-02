@@ -1,5 +1,6 @@
 package com.kaizensundays.fusion.quickfix.messages
 
+import org.junit.Before
 import org.junit.Test
 import quickfix.field.BeginString
 import quickfix.field.MaturityMonthYear
@@ -21,13 +22,20 @@ class GenericFixMessageConverterTest {
 
     val factory = TestMessageFactory()
 
-    val converter = GenericFixMessageConverter()
+    val dictionary = FixDictionary("FIX44.xml")
+
+    val converter = GenericFixMessageConverter(dictionary)
 
     val objs = arrayOf(
         factory.newOrderSingle(Side.BUY, 100.0, "ABNB"),
         factory.newOrderSingle(Side.SELL, 300.0, "AMZN"),
         factory.newOrderSingle(Side.BUY, 700.0, "UBER"),
     )
+
+    @Before
+    fun before() {
+        dictionary.init()
+    }
 
     @Test
     fun fromObject() {

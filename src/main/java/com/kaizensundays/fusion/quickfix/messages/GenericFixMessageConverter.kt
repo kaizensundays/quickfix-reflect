@@ -4,14 +4,7 @@ import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import quickfix.Message
-import quickfix.field.BeginString
 import quickfix.field.MaturityMonthYear
-import quickfix.field.MsgType
-import quickfix.field.OrderQty
-import quickfix.field.SenderCompID
-import quickfix.field.Side
-import quickfix.field.Symbol
-import quickfix.field.TargetCompID
 import quickfix.field.TransactTime
 import java.lang.reflect.Field
 
@@ -20,28 +13,24 @@ import java.lang.reflect.Field
  *
  * @author Sergey Chuykov
  */
-class GenericFixMessageConverter : ObjectConverter<Message, FixMessage> {
-
-    val nameToTagMap = mapOf(
-        "BeginString" to BeginString.FIELD,
-        "MsgType" to MsgType.FIELD,
-        "SenderCompID" to SenderCompID.FIELD,
-        "TargetCompID" to TargetCompID.FIELD,
-        "Side" to Side.FIELD,
-        "OrderQty" to OrderQty.FIELD,
-        "Symbol" to Symbol.FIELD,
-        "MaturityMonthYear" to MaturityMonthYear.FIELD,
-        "TransactTime" to TransactTime.FIELD,
-    )
+class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
     val tagToTypeMap = mapOf(
         MaturityMonthYear.FIELD to "INT",
         TransactTime.FIELD to "UTCTIMESTAMP",
     )
 
+    private fun tag(fieldName: String): Int? {
+        val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
+        if (field != null) {
+            return field.number.toInt()
+        }
+        return null
+    }
+
     fun FieldMap.set(field: Field, obj: FixMessage) {
 
-        val tag = nameToTagMap[field.name.firstCharToUpper()]
+        val tag = tag(field.name)
         if (tag != null) {
             when (field.type) {
                 Character::class.java -> {
