@@ -13,12 +13,32 @@ import java.lang.reflect.Field
  */
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
-/*
-    val tagToTypeMap = mapOf(
-        MaturityMonthYear.FIELD to "INT",
-        TransactTime.FIELD to "UTCTIMESTAMP",
+    val fixFieldSettersMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: FixMessage) -> Unit> = mapOf(
+        Character::class.java to { tag, field, obj ->
+            this.setChar(tag, field.get(obj) as Char)
+        },
+        String::class.java to { tag, field, obj ->
+            this.setString(tag, field.get(obj) as String)
+        },
+        java.lang.Double::class.java to { tag, field, obj ->
+            this.setDouble(tag, field.get(obj) as Double)
+        },
+        java.lang.Long::class.java to { tag, field, obj ->
+            when (fixType(tag)) {
+                "UTCTIMESTAMP" -> {
+                    val timestamp = field.get(obj) as Long
+                    this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
+                }
+                "MONTHYEAR" -> {
+                    this.setInt(tag, (field.get(obj) as Long).toInt())
+                }
+                "INT" -> {
+                    this.setInt(tag, (field.get(obj) as Long).toInt())
+                }
+            }
+        },
     )
-*/
+
 
     private fun tag(fieldName: String): Int? {
         val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
@@ -34,32 +54,12 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 
         val tag = tag(field.name)
         if (tag != null) {
-            when (field.type) {
-                Character::class.java -> {
-                    this.setChar(tag, field.get(obj) as Char)
-                }
-                String::class.java -> {
-                    this.setString(tag, field.get(obj) as String)
-                }
-                java.lang.Double::class.java -> {
-                    this.setDouble(tag, field.get(obj) as Double)
-                }
-                java.lang.Long::class.java -> {
-                    val fixType = fixType(tag)
-                    when (fixType) {
-                        "UTCTIMESTAMP" -> {
-                            val timestamp = field.get(obj) as Long
-                            this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
-                        }
-                        "MONTHYEAR" -> {
-                            this.setInt(tag, (field.get(obj) as Long).toInt())
-                        }
-                        "INT" -> {
-                            this.setInt(tag, (field.get(obj) as Long).toInt())
-                        }
-                    }
-                }
+
+            val setter = fixFieldSettersMap[field.type]
+            if (setter != null) {
+                this.setter(tag, field, obj)
             }
+
         }
     }
 
