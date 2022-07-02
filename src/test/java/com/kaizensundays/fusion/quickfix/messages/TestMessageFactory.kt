@@ -1,6 +1,5 @@
-package com.kaizensundays.fusion.messages
+package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.messages.NewOrderSingle
 import com.kaizensundays.fusion.quickfix.toEpochMilli
 import quickfix.FixVersions
 import java.time.LocalDateTime

@@ -1,6 +1,5 @@
-package com.kaizensundays.fusion.messages
+package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.messages.GenericFixMessageConverter
 import org.junit.Test
 import quickfix.field.BeginString
 import quickfix.field.MaturityMonthYear
