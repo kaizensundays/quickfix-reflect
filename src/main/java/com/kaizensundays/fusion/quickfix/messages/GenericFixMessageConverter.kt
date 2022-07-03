@@ -19,8 +19,13 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         this.setChar(tag, field.get(obj) as Char)
     }
 
+    val intSetter: FixFieldSetter = { tag, field, obj ->
+        this.setInt(tag, field.get(obj) as Int)
+    }
+
     val fixFieldSettersMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: FixMessage) -> Unit> = mapOf(
         Character::class.java to charSetter,
+        Integer::class.java to intSetter,
         String::class.java to { tag, field, obj ->
             this.setString(tag, field.get(obj) as String)
         },
