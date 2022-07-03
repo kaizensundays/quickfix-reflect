@@ -35,6 +35,9 @@ class TestMessageFactory {
         obj.quoteReqID = UUID.randomUUID().toString()
         obj.symbol = symbol
         obj.noRelatedSym = noRelatedSym
+
+        obj.instrumentLeg = arrayOf(InstrumentLeg(symbol), InstrumentLeg(symbol))
+
         obj.transactTime = toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
         return obj;
     }

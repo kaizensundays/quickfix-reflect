@@ -1,5 +1,7 @@
 package com.kaizensundays.fusion.quickfix.messages
 
+import com.kaizensundays.fusion.quickfix.firstCharToUpper
+import com.kaizensundays.fusion.quickfix.fix44.ComponentType
 import com.kaizensundays.fusion.quickfix.fix44.FieldType
 import com.kaizensundays.fusion.quickfix.fix44.FixType
 import org.springframework.core.io.ClassPathResource
@@ -16,6 +18,7 @@ class FixDictionary(private val path: String) {
 
     private var nameToFieldMap: Map<String, FieldType> = emptyMap()
     private var tagToFieldMap: Map<Int, FieldType> = emptyMap()
+    private var nameToComponentMap: Map<String, ComponentType> = emptyMap()
 
     fun init() {
 
@@ -36,14 +39,25 @@ class FixDictionary(private val path: String) {
         nameToFieldMap = fields.map { field -> field.name to field }.toMap()
 
         tagToFieldMap = fields.map { field -> field.number.toInt() to field }.toMap()
+
+        val components = fix.components.component
+
+        nameToComponentMap = components.map { c -> c.name to c }.toMap()
     }
 
     fun nameToFieldMap(): Map<String, FieldType> {
-        return nameToFieldMap;
+        return nameToFieldMap
     }
 
     fun tagToFieldMap(): Map<Int, FieldType> {
-        return tagToFieldMap;
+        return tagToFieldMap
     }
 
+    fun nameToComponentMap(): Map<String, ComponentType> {
+        return nameToComponentMap
+    }
+
+    fun hasComponent(name: String): Boolean {
+        return nameToComponentMap.containsKey(name.firstCharToUpper())
+    }
 }

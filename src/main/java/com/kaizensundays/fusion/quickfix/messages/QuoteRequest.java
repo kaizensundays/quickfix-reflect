@@ -14,6 +14,8 @@ public class QuoteRequest extends FixMessage {
     public String symbol;
     public Long transactTime;
 
+    public InstrumentLeg[] instrumentLeg = {};
+
     public QuoteRequest() {
         super(MsgType.QUOTE_REQUEST);
     }

@@ -4,6 +4,7 @@ import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import quickfix.Message
+import quickfix.field.NoLegs
 import java.lang.reflect.Field
 
 /**
@@ -11,7 +12,7 @@ import java.lang.reflect.Field
  *
  * @author Sergey Chuykov
  */
-typealias FixFieldSetter = FieldMap.(Int, Field, FixMessage) -> Unit
+typealias FixFieldSetter = FieldMap.(Int, Field, Any) -> Unit
 
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
@@ -23,7 +24,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         this.setInt(tag, field.get(obj) as Int)
     }
 
-    val fixFieldSettersMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: FixMessage) -> Unit> = mapOf(
+    val fixFieldSettersMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: Any) -> Unit> = mapOf(
         Character::class.java to charSetter,
         Integer::class.java to intSetter,
         String::class.java to { tag, field, obj ->
@@ -59,7 +60,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         return if (field != null) field.type else "?"
     }
 
-    fun FieldMap.set(field: Field, obj: FixMessage) {
+    fun FieldMap.set(field: Field, obj: Any) {
 
         val tag = tag(field.name)
         if (tag != null) {
@@ -69,10 +70,21 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
                 this.setter(tag, field, obj)
             }
 
+        } else if (dictionary.hasComponent(field.name)) {
+            if (field.type.isArray) {
+                this.setInt(NoLegs.FIELD, 2)
+                val components = field.get(obj) as Array<Any>
+                components.forEach { c ->
+                    val group = quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs()
+                    group.setFields(c.javaClass, c)
+                    this.addGroup(group)
+                }
+            }
+            println()
         }
     }
 
-    fun FieldMap.setFields(type: Class<*>, obj: FixMessage) {
+    fun FieldMap.setFields(type: Class<*>, obj: Any) {
 
         val fieldMap = type.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
 
