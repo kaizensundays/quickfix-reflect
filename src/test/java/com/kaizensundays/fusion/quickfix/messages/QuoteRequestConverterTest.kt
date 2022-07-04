@@ -80,19 +80,14 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
             assertTrue(obj is QuoteRequest)
 
             with(msg) {
-/*
                 assertEquals(header.getString(BeginString.FIELD), obj.beginString)
                 assertEquals(header.getString(MsgType.FIELD), obj.msgType)
                 assertEquals(header.getString(SenderCompID.FIELD), obj.senderCompID)
                 assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
-*/
 
                 assertEquals(obj.symbol, getString(Symbol.FIELD))
                 assertEquals(obj.noRelatedSym, getInt(NoRelatedSym.FIELD))
             }
-
-            assertEquals(obj.symbol, msg.getString(Symbol.FIELD))
-
         }
 
     }

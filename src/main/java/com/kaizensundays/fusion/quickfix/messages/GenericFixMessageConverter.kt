@@ -7,6 +7,7 @@ import quickfix.Group
 import quickfix.Message
 import quickfix.field.MsgType
 import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 
 /**
  * Created: Saturday 6/25/2022, 12:32 PM Eastern Time
@@ -32,7 +33,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         componentToGroupMap[component.javaClass]?.invoke()
     }
 
-    val charSetter: SetTag = { tag, field, obj ->
+    val setChar: SetTag = { tag, field, obj ->
         val value = field.get(obj)
         if (value != null) {
             this.setChar(tag, field.get(obj) as Char)
@@ -42,7 +43,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     val getString: GetTag = { tag, field, obj ->
         if (this.isSetField(tag)) {
             val value = this.getString(tag)
-            field.set(obj, value)
+            if (!field.isFinal()) {
+                field.set(obj, value)
+            }
         }
     }
 
@@ -56,7 +59,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     val getInt: GetTag = { tag, field, obj ->
         if (this.isSetField(tag)) {
             val value = this.getInt(tag)
-            field.set(obj, value)
+            if (!field.isFinal()) {
+                field.set(obj, value)
+            }
         }
     }
 
@@ -67,7 +72,22 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val doubleSetter: SetTag = { tag, field, obj ->
+    val setLong: SetTag = { tag, field, obj ->
+        when (fixType(tag)) {
+            "UTCTIMESTAMP" -> {
+                val timestamp = field.get(obj) as Long
+                this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
+            }
+            "MONTHYEAR" -> {
+                this.setInt(tag, (field.get(obj) as Long).toInt())
+            }
+            "INT" -> {
+                this.setInt(tag, (field.get(obj) as Long).toInt())
+            }
+        }
+    }
+
+    val setDouble: SetTag = { tag, field, obj ->
         val value = field.get(obj)
         if (value != null) {
             this.setDouble(tag, field.get(obj) as Double)
@@ -75,30 +95,19 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     }
 
     val fixFieldSettersMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: Any) -> Unit> = mapOf(
-        Character::class.java to charSetter,
-        Integer::class.java to setInt,
+        Character::class.java to setChar,
         String::class.java to setString,
-        java.lang.Double::class.java to doubleSetter,
-        java.lang.Long::class.java to { tag, field, obj ->
-            when (fixType(tag)) {
-                "UTCTIMESTAMP" -> {
-                    val timestamp = field.get(obj) as Long
-                    this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
-                }
-                "MONTHYEAR" -> {
-                    this.setInt(tag, (field.get(obj) as Long).toInt())
-                }
-                "INT" -> {
-                    this.setInt(tag, (field.get(obj) as Long).toInt())
-                }
-            }
-        },
+        Integer::class.java to setInt,
+        java.lang.Long::class.java to setLong,
+        java.lang.Double::class.java to setDouble,
     )
 
     private val getTagMap: Map<Class<*>, GetTag> = mapOf(
         String::class.java to getString,
-        java.lang.Integer::class.java to getInt,
+        Integer::class.java to getInt,
     )
+
+    private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
     private fun tag(fieldName: String): Int? {
         val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
@@ -165,9 +174,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         return msg
     }
 
-    fun FieldMap.getFields(obj: FixMessage) {
-
-        val type: Class<*> = obj.javaClass
+    fun FieldMap.getFields(type: Class<*>, obj: FixMessage) {
 
         val fieldMap = type.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
 
@@ -192,7 +199,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 
         val obj = msgTypeToJavaTypeMap[msg.header.getString(MsgType.FIELD)]?.invoke() ?: throw IllegalStateException()
 
-        msg.getFields(obj)
+        msg.header.getFields(FixMessage::class.java, obj)
+
+        msg.getFields(obj.javaClass, obj)
 
         return obj
     }
