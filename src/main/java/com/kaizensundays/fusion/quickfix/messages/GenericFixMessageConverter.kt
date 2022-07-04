@@ -33,6 +33,13 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         componentToGroupMap[component.javaClass]?.invoke()
     }
 
+    private fun Any.getAndSet(field: Field, set: (Any) -> Unit) {
+        val value = field.get(this)
+        if (value != null) {
+            set(value)
+        }
+    }
+
     val setChar: SetTag = { tag, field, obj ->
         val value = field.get(obj)
         if (value != null) {
@@ -49,11 +56,8 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val setString: SetTag = { tag, field, obj ->
-        val value = field.get(obj)
-        if (value != null) {
-            this.setString(tag, field.get(obj) as String)
-        }
+    private val setString: SetTag = { tag, field, obj ->
+        obj.getAndSet(field) { value -> this.setString(tag, value as String) }
     }
 
     val getInt: GetTag = { tag, field, obj ->
@@ -65,11 +69,8 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val setInt: SetTag = { tag, field, obj ->
-        val value = field.get(obj)
-        if (value != null) {
-            this.setInt(tag, value as Int)
-        }
+    private val setInt: SetTag = { tag, field, obj ->
+        obj.getAndSet(field) { value -> this.setInt(tag, value as Int) }
     }
 
     val setLong: SetTag = { tag, field, obj ->
