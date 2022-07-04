@@ -26,7 +26,7 @@ class TestMessageFactory {
         return obj;
     }
 
-    fun quoteRequest(symbol: String, noRelatedSym: Int): QuoteRequest {
+    fun quoteRequest(symbol: String, noRelatedSym: Int, instrumentLeg: Array<InstrumentLeg>): QuoteRequest {
         val obj = QuoteRequest()
         obj.beginString = FixVersions.BEGINSTRING_FIX44
         obj.senderCompID = "IB"
@@ -36,7 +36,8 @@ class TestMessageFactory {
         obj.symbol = symbol
         obj.noRelatedSym = noRelatedSym
 
-        obj.instrumentLeg = arrayOf(InstrumentLeg(symbol), InstrumentLeg(symbol))
+        //obj.instrumentLeg = arrayOf(InstrumentLeg(symbol), InstrumentLeg(symbol))
+        obj.instrumentLeg = instrumentLeg
 
         obj.transactTime = toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
         return obj;
