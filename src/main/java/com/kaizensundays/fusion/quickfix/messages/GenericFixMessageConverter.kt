@@ -18,19 +18,26 @@ typealias GroupFactory = () -> Group
 
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
-    private val noLegsFactory: GroupFactory = { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
-
     private val map: Map<*, GroupFactory> = mapOf(
-        InstrumentLeg::class.java to noLegsFactory
+        InstrumentLeg::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
     )
 
     private val groupFactory: (component: Any) -> Group? = { component ->
         map[component.javaClass]?.invoke()
     }
 
-
     val charSetter: FixFieldSetter = { tag, field, obj ->
-        this.setChar(tag, field.get(obj) as Char)
+        val value = field.get(obj)
+        if (value != null) {
+            this.setChar(tag, field.get(obj) as Char)
+        }
+    }
+
+    val stringSetter: FixFieldSetter = { tag, field, obj ->
+        val value = field.get(obj)
+        if (value != null) {
+            this.setString(tag, field.get(obj) as String)
+        }
     }
 
     val intSetter: FixFieldSetter = { tag, field, obj ->
@@ -40,15 +47,18 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
+    val doubleSetter: FixFieldSetter = { tag, field, obj ->
+        val value = field.get(obj)
+        if (value != null) {
+            this.setDouble(tag, field.get(obj) as Double)
+        }
+    }
+
     val fixFieldSettersMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: Any) -> Unit> = mapOf(
         Character::class.java to charSetter,
         Integer::class.java to intSetter,
-        String::class.java to { tag, field, obj ->
-            this.setString(tag, field.get(obj) as String)
-        },
-        java.lang.Double::class.java to { tag, field, obj ->
-            this.setDouble(tag, field.get(obj) as Double)
-        },
+        String::class.java to stringSetter,
+        java.lang.Double::class.java to doubleSetter,
         java.lang.Long::class.java to { tag, field, obj ->
             when (fixType(tag)) {
                 "UTCTIMESTAMP" -> {
