@@ -3,8 +3,8 @@ package com.kaizensundays.fusion.quickfix.messages
 import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
+import quickfix.Group
 import quickfix.Message
-import quickfix.field.NoLegs
 import java.lang.reflect.Field
 
 /**
@@ -14,7 +14,20 @@ import java.lang.reflect.Field
  */
 typealias FixFieldSetter = FieldMap.(Int, Field, Any) -> Unit
 
+typealias GroupFactory = () -> Group
+
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
+
+    private val noLegsFactory: GroupFactory = { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
+
+    private val map: Map<*, GroupFactory> = mapOf(
+        InstrumentLeg::class.java to noLegsFactory
+    )
+
+    private val groupFactory: (component: Any) -> Group? = { component ->
+        map[component.javaClass]?.invoke()
+    }
+
 
     val charSetter: FixFieldSetter = { tag, field, obj ->
         this.setChar(tag, field.get(obj) as Char)
@@ -75,12 +88,16 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 
         } else if (dictionary.hasComponent(field.name)) {
             if (field.type.isArray) {
-                this.setInt(NoLegs.FIELD, 2)
                 val components = field.get(obj) as Array<Any>
-                components.forEach { c ->
-                    val group = quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs()
-                    group.setFields(c.javaClass, c)
-                    this.addGroup(group)
+                components.forEach { component ->
+                    val group = groupFactory(component)
+                    if (group != null) {
+                        if (!this.isSetField(group.fieldTag)) {
+                            this.setInt(group.fieldTag, components.size)
+                        }
+                        group.setFields(component.javaClass, component)
+                        this.addGroup(group)
+                    }
                 }
             }
             println()

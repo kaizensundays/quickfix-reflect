@@ -43,7 +43,7 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
     @Test
     fun fromObject() {
 
-        objs.forEachIndexed { _, obj ->
+        objs.forEach { obj ->
             val msg = converter.fromObject(obj)
 
             with(msg) {
@@ -55,12 +55,11 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
                 assertEquals(obj.symbol, getString(Symbol.FIELD))
                 assertEquals(obj.noRelatedSym, getInt(NoRelatedSym.FIELD))
 
-                assertEquals(obj.instrumentLeg.size, getInt(NoLegs.FIELD))
-
                 assertEquals("2022-07-03T17:11:03", getUtcTimeStamp(TransactTime.FIELD).toString())
 
-                val groups = msg.getGroups(NoLegs.FIELD)
+                assertEquals(obj.instrumentLeg.size, getInt(NoLegs.FIELD))
 
+                val groups = msg.getGroups(NoLegs.FIELD)
                 groups.forEachIndexed { i, group ->
                     assertEquals(obj.instrumentLeg[i].legSymbol, group.getString(LegSymbol.FIELD))
                 }
