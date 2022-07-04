@@ -13,7 +13,8 @@ import java.lang.reflect.Field
  *
  * @author Sergey Chuykov
  */
-typealias FixFieldSetter = FieldMap.(Int, Field, Any) -> Unit
+typealias SetTag = FieldMap.(Int, Field, Any) -> Unit
+typealias GetTag = FieldMap.(Int, Field, Any) -> Unit
 
 typealias GroupFactory = () -> Group
 
@@ -31,28 +32,42 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         componentToGroupMap[component.javaClass]?.invoke()
     }
 
-    val charSetter: FixFieldSetter = { tag, field, obj ->
+    val charSetter: SetTag = { tag, field, obj ->
         val value = field.get(obj)
         if (value != null) {
             this.setChar(tag, field.get(obj) as Char)
         }
     }
 
-    val stringSetter: FixFieldSetter = { tag, field, obj ->
+    val getString: GetTag = { tag, field, obj ->
+        if (this.isSetField(tag)) {
+            val value = this.getString(tag)
+            field.set(obj, value)
+        }
+    }
+
+    val setString: SetTag = { tag, field, obj ->
         val value = field.get(obj)
         if (value != null) {
             this.setString(tag, field.get(obj) as String)
         }
     }
 
-    val intSetter: FixFieldSetter = { tag, field, obj ->
+    val getInt: GetTag = { tag, field, obj ->
+        if (this.isSetField(tag)) {
+            val value = this.getInt(tag)
+            field.set(obj, value)
+        }
+    }
+
+    val setInt: SetTag = { tag, field, obj ->
         val value = field.get(obj)
         if (value != null) {
             this.setInt(tag, value as Int)
         }
     }
 
-    val doubleSetter: FixFieldSetter = { tag, field, obj ->
+    val doubleSetter: SetTag = { tag, field, obj ->
         val value = field.get(obj)
         if (value != null) {
             this.setDouble(tag, field.get(obj) as Double)
@@ -61,8 +76,8 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 
     val fixFieldSettersMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: Any) -> Unit> = mapOf(
         Character::class.java to charSetter,
-        Integer::class.java to intSetter,
-        String::class.java to stringSetter,
+        Integer::class.java to setInt,
+        String::class.java to setString,
         java.lang.Double::class.java to doubleSetter,
         java.lang.Long::class.java to { tag, field, obj ->
             when (fixType(tag)) {
@@ -80,6 +95,10 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         },
     )
 
+    private val getTagMap: Map<Class<*>, GetTag> = mapOf(
+        String::class.java to getString,
+        java.lang.Integer::class.java to getInt,
+    )
 
     private fun tag(fieldName: String): Int? {
         val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
@@ -155,12 +174,14 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         val names = fieldMap.map { entry -> entry.key }
 
         names.forEach { name ->
-            val f = fieldMap[name]
-            if (f != null) {
-                val tag = tag(f.name)
-                if (tag != null && this.isSetField(tag)) {
-                    val value = this.getString(tag)
-                    f.set(obj, value)
+            val field = fieldMap[name]
+            if (field != null) {
+                val tag = tag(field.name)
+                if (tag != null) {
+                    val getTag = getTagMap[field.type]
+                    if (getTag != null) {
+                        this.getTag(tag, field, obj)
+                    }
                 }
             }
         }
