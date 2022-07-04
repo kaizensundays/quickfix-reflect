@@ -8,11 +8,13 @@ package com.kaizensundays.fusion.quickfix.messages;
 public class InstrumentLeg {
 
     public String legSymbol;
+    public Integer legProduct;
 
     public InstrumentLeg() {
     }
 
-    public InstrumentLeg(String legSymbol) {
+    public InstrumentLeg(String legSymbol, Integer legProduct) {
         this.legSymbol = legSymbol;
+        this.legProduct = legProduct;
     }
 }

@@ -21,7 +21,10 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     }
 
     val intSetter: FixFieldSetter = { tag, field, obj ->
-        this.setInt(tag, field.get(obj) as Int)
+        val value = field.get(obj)
+        if (value != null) {
+            this.setInt(tag, value as Int)
+        }
     }
 
     val fixFieldSettersMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: Any) -> Unit> = mapOf(

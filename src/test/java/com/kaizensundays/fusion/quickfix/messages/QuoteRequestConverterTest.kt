@@ -23,15 +23,15 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
     val objs = arrayOf(
         factory.quoteRequest(
             "ABNB", 2,
-            arrayOf(InstrumentLeg("ABNB.1"), InstrumentLeg("ABNB.2"))
+            arrayOf(InstrumentLeg("ABNB.1", 1), InstrumentLeg("ABNB.2", 3))
         ),
         factory.quoteRequest(
             "AMZN", 2,
-            arrayOf(InstrumentLeg("AMZN.1"), InstrumentLeg("AMZN.2"))
+            arrayOf(InstrumentLeg("AMZN.1", 1), InstrumentLeg("AMZN.2", 3))
         ),
         factory.quoteRequest(
             "UBER", 2,
-            arrayOf(InstrumentLeg("UBER.1"), InstrumentLeg("UBER.2"))
+            arrayOf(InstrumentLeg("UBER.1", 1), InstrumentLeg("UBER.2", 3))
         ),
     )
 
