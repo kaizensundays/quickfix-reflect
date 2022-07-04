@@ -33,20 +33,23 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
     @Test
     fun fromObject() {
 
-        objs.forEachIndexed { i, obj ->
+        objs.forEachIndexed { _, obj ->
             val msg = converter.fromObject(obj)
 
-            assertEquals(objs[i].beginString, msg.header.getString(BeginString.FIELD))
-            assertEquals(objs[i].msgType, msg.header.getString(MsgType.FIELD))
-            assertEquals(objs[i].senderCompID, msg.header.getString(SenderCompID.FIELD))
-            assertEquals(objs[i].targetCompID, msg.header.getString(TargetCompID.FIELD))
+            with(msg) {
+                assertEquals(obj.beginString, header.getString(BeginString.FIELD))
+                assertEquals(obj.msgType, header.getString(MsgType.FIELD))
+                assertEquals(obj.senderCompID, header.getString(SenderCompID.FIELD))
+                assertEquals(obj.targetCompID, header.getString(TargetCompID.FIELD))
 
-            assertEquals(objs[i].symbol, msg.getString(Symbol.FIELD))
-            assertEquals(objs[i].noRelatedSym, msg.getInt(NoRelatedSym.FIELD))
+                assertEquals(obj.symbol, getString(Symbol.FIELD))
+                assertEquals(obj.noRelatedSym, getInt(NoRelatedSym.FIELD))
 
-            assertEquals(objs[i].instrumentLeg.size, msg.getInt(NoLegs.FIELD))
+                assertEquals(obj.instrumentLeg.size, getInt(NoLegs.FIELD))
 
-            assertEquals("2022-07-03T17:11:03", msg.getUtcTimeStamp(TransactTime.FIELD).toString())
+                assertEquals("2022-07-03T17:11:03", getUtcTimeStamp(TransactTime.FIELD).toString())
+            }
+
         }
 
     }
