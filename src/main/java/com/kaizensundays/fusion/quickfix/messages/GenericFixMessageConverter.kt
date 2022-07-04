@@ -5,6 +5,7 @@ import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import quickfix.Group
 import quickfix.Message
+import quickfix.field.MsgType
 import java.lang.reflect.Field
 
 /**
@@ -18,12 +19,16 @@ typealias GroupFactory = () -> Group
 
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
-    private val map: Map<*, GroupFactory> = mapOf(
+    private val msgTypeToJavaTypeMap: Map<*, () -> FixMessage> = mapOf(
+        MsgType.QUOTE_REQUEST to { QuoteRequest() }
+    )
+
+    private val componentToGroupMap: Map<*, GroupFactory> = mapOf(
         InstrumentLeg::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
     )
 
     private val groupFactory: (component: Any) -> Group? = { component ->
-        map[component.javaClass]?.invoke()
+        componentToGroupMap[component.javaClass]?.invoke()
     }
 
     val charSetter: FixFieldSetter = { tag, field, obj ->
@@ -141,8 +146,34 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         return msg
     }
 
-    override fun toObject(obj: Message): FixMessage {
-        return NewOrderSingle()
+    fun FieldMap.getFields(obj: FixMessage) {
+
+        val type: Class<*> = obj.javaClass
+
+        val fieldMap = type.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
+
+        val names = fieldMap.map { entry -> entry.key }
+
+        names.forEach { name ->
+            val f = fieldMap[name]
+            if (f != null) {
+                val tag = tag(f.name)
+                if (tag != null && this.isSetField(tag)) {
+                    val value = this.getString(tag)
+                    f.set(obj, value)
+                }
+            }
+        }
+    }
+
+    override fun toObject(msg: Message): FixMessage {
+
+
+        val obj = msgTypeToJavaTypeMap[msg.header.getString(MsgType.FIELD)]?.invoke() ?: throw IllegalStateException()
+
+        msg.getFields(obj)
+
+        return obj
     }
 
 }

@@ -69,4 +69,19 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
 
     }
 
+    @Test
+    fun toObject() {
+
+        objs.forEachIndexed { i, _ ->
+            val msg = converter.fromObject(objs[i])
+
+            val obj = converter.toObject(msg)
+
+            assertTrue(obj is QuoteRequest)
+            assertEquals(obj.symbol, msg.getString(Symbol.FIELD))
+
+        }
+
+    }
+
 }
