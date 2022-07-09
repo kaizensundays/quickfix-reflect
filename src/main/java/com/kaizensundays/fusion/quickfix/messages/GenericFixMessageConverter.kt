@@ -15,7 +15,7 @@ import java.lang.reflect.Modifier
  * @author Sergey Chuykov
  */
 typealias FieldToTag = FieldMap.(Int, Field, Any) -> Unit
-typealias GetTag = FieldMap.(Int, Field, Any) -> Unit
+typealias TagToField = FieldMap.(Int, Field, Any) -> Unit
 
 typealias GroupFactory = () -> Group
 
@@ -47,7 +47,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val getString: GetTag = { tag, field, obj ->
+    val getString: TagToField = { tag, field, obj ->
         if (this.isSetField(tag)) {
             val value = this.getString(tag)
             if (!field.isFinal()) {
@@ -60,7 +60,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         obj.getAndSet(field) { value -> this.setString(tag, value as String) }
     }
 
-    val getInt: GetTag = { tag, field, obj ->
+    val getInt: TagToField = { tag, field, obj ->
         if (this.isSetField(tag)) {
             val value = this.getInt(tag)
             if (!field.isFinal()) {
@@ -103,7 +103,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         java.lang.Double::class.java to setDouble,
     )
 
-    private val getTagMap: Map<Class<*>, GetTag> = mapOf(
+    private val getTagMap: Map<Class<*>, TagToField> = mapOf(
         String::class.java to getString,
         Integer::class.java to getInt,
     )
