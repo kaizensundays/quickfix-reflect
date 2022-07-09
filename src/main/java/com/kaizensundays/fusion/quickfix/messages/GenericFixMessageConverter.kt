@@ -15,7 +15,7 @@ import java.lang.reflect.Modifier
  * @author Sergey Chuykov
  */
 typealias FieldToTag = FieldMap.(Int, Field, Any) -> Unit
-typealias TagToField = FieldMap.(Int, Field, Any) -> Unit
+typealias SetField = Any.(Field, Int, FieldMap) -> Unit
 
 typealias GroupFactory = () -> Group
 
@@ -47,11 +47,11 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val getString: TagToField = { tag, field, obj ->
-        if (this.isSetField(tag)) {
-            val value = this.getString(tag)
+    val setStringField: SetField = { field, tag, msg ->
+        if (msg.isSetField(tag)) {
+            val value = msg.getString(tag)
             if (!field.isFinal()) {
-                field.set(obj, value)
+                field.set(this, value)
             }
         }
     }
@@ -60,11 +60,11 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         obj.getAndSet(field) { value -> this.setString(tag, value as String) }
     }
 
-    val getInt: TagToField = { tag, field, obj ->
-        if (this.isSetField(tag)) {
-            val value = this.getInt(tag)
+    val setIntField: SetField = { field, tag, msg ->
+        if (msg.isSetField(tag)) {
+            val value = msg.getInt(tag)
             if (!field.isFinal()) {
-                field.set(obj, value)
+                field.set(this, value)
             }
         }
     }
@@ -103,9 +103,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         java.lang.Double::class.java to setDouble,
     )
 
-    private val getTagMap: Map<Class<*>, TagToField> = mapOf(
-        String::class.java to getString,
-        Integer::class.java to getInt,
+    private val setFieldMap: Map<Class<*>, SetField> = mapOf(
+        String::class.java to setStringField,
+        Integer::class.java to setIntField,
     )
 
     private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
@@ -186,9 +186,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
             if (field != null) {
                 val tag = tag(field.name)
                 if (tag != null) {
-                    val getTag = getTagMap[field.type]
-                    if (getTag != null) {
-                        this.getTag(tag, field, obj)
+                    val setField = setFieldMap[field.type]
+                    if (setField != null) {
+                        obj.setField(field, tag, this)
                     }
                 }
             }
