@@ -14,7 +14,7 @@ import java.lang.reflect.Modifier
  *
  * @author Sergey Chuykov
  */
-typealias SetTag = FieldMap.(Int, Field, Any) -> Unit
+typealias FieldToTag = FieldMap.(Int, Field, Any) -> Unit
 typealias GetTag = FieldMap.(Int, Field, Any) -> Unit
 
 typealias GroupFactory = () -> Group
@@ -40,7 +40,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val setChar: SetTag = { tag, field, obj ->
+    val setChar: FieldToTag = { tag, field, obj ->
         val value = field.get(obj)
         if (value != null) {
             this.setChar(tag, field.get(obj) as Char)
@@ -56,7 +56,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    private val setString: SetTag = { tag, field, obj ->
+    private val setString: FieldToTag = { tag, field, obj ->
         obj.getAndSet(field) { value -> this.setString(tag, value as String) }
     }
 
@@ -69,11 +69,11 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    private val setInt: SetTag = { tag, field, obj ->
+    private val setInt: FieldToTag = { tag, field, obj ->
         obj.getAndSet(field) { value -> this.setInt(tag, value as Int) }
     }
 
-    val setLong: SetTag = { tag, field, obj ->
+    val setLong: FieldToTag = { tag, field, obj ->
         when (fixType(tag)) {
             "UTCTIMESTAMP" -> {
                 val timestamp = field.get(obj) as Long
@@ -88,7 +88,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val setDouble: SetTag = { tag, field, obj ->
+    val setDouble: FieldToTag = { tag, field, obj ->
         val value = field.get(obj)
         if (value != null) {
             this.setDouble(tag, field.get(obj) as Double)
