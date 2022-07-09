@@ -17,7 +17,7 @@ import kotlin.test.assertEquals
  *
  * @author Sergey Chuykov
  */
-class GenericFixMessageConverterTest : GenericFixMessageConverterTestSupport() {
+class NewOrderSingleConverterTest : GenericFixMessageConverterTestSupport() {
 
     val objs = arrayOf(
         factory.newOrderSingle(Side.BUY, 100.0, "ABNB"),
