@@ -13,7 +13,7 @@ public class NewOrderSingle extends FixMessage {
     public Double orderQty;
     public String symbol;
     public Long maturityMonthYear;
-    //public Long transactTime;
+    public Long transactTime;
 
     public NewOrderSingle() {
         super(MsgType.ORDER_SINGLE);

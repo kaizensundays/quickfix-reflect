@@ -1,6 +1,7 @@
 package com.kaizensundays.fusion.quickfix.messages
 
 import com.kaizensundays.fusion.quickfix.firstCharToUpper
+import com.kaizensundays.fusion.quickfix.toEpochMilli
 import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import quickfix.Group
@@ -103,9 +104,19 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 
     val setLongField: SetField = { field, tag, msg ->
         if (msg.isSetField(tag)) {
-            val value = msg.getInt(tag).toLong()
-            if (!field.isFinal()) {
-                field.set(this, value)
+            when (fixType(tag)) {
+                "UTCTIMESTAMP" -> {
+                    val value = toEpochMilli(msg.getUtcTimeStamp(tag))
+                    if (!field.isFinal()) {
+                        field.set(this, value)
+                    }
+                }
+                "MONTHYEAR" -> {
+                    val value = msg.getInt(tag).toLong()
+                    if (!field.isFinal()) {
+                        field.set(this, value)
+                    }
+                }
             }
         }
     }

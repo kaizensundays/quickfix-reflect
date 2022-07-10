@@ -22,7 +22,7 @@ class TestMessageFactory {
         obj.orderQty = orderQty
         obj.symbol = symbol
         obj.maturityMonthYear = 20220715
-        //obj.transactTime = toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
+        obj.transactTime = toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
         return obj;
     }
 
@@ -38,7 +38,7 @@ class TestMessageFactory {
 
         obj.instrumentLeg = instrumentLeg
 
-        //obj.transactTime = toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
+        obj.transactTime = toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
         return obj;
     }
 
