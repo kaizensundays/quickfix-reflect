@@ -101,6 +101,15 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
+    val setLongField: SetField = { field, tag, msg ->
+        if (msg.isSetField(tag)) {
+            val value = msg.getInt(tag).toLong()
+            if (!field.isFinal()) {
+                field.set(this, value)
+            }
+        }
+    }
+
     val setDoubleField: SetField = { field, tag, msg ->
         if (msg.isSetField(tag)) {
             val value = msg.getDouble(tag)
@@ -122,6 +131,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         Character::class.java to setCharField,
         String::class.java to setStringField,
         Integer::class.java to setIntField,
+        java.lang.Long::class.java to setLongField,
         java.lang.Double::class.java to setDoubleField,
     )
 

@@ -12,7 +12,7 @@ public class QuoteRequest extends FixMessage {
     public String quoteReqID;
     public Integer noRelatedSym;
     public String symbol;
-    public Long transactTime;
+    //public Long transactTime;
 
     public InstrumentLeg[] instrumentLeg = {};
 
