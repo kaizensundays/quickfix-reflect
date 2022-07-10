@@ -4,6 +4,7 @@ import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import com.kaizensundays.fusion.quickfix.fix44.ComponentType
 import com.kaizensundays.fusion.quickfix.fix44.FieldType
 import com.kaizensundays.fusion.quickfix.fix44.FixType
+import com.kaizensundays.fusion.quickfix.fix44.GroupType
 import org.springframework.core.io.ClassPathResource
 import java.io.FileInputStream
 import javax.xml.bind.JAXBContext
@@ -19,6 +20,7 @@ class FixDictionary(private val path: String) {
     private var nameToFieldMap: Map<String, FieldType> = emptyMap()
     private var tagToFieldMap: Map<Int, FieldType> = emptyMap()
     private var nameToComponentMap: Map<String, ComponentType> = emptyMap()
+    private var mstTypeToGroupsMap: Map<String, List<GroupType>> = emptyMap()
 
     fun init() {
 
@@ -43,6 +45,9 @@ class FixDictionary(private val path: String) {
         val components = fix.components.component
 
         nameToComponentMap = components.map { c -> c.name to c }.toMap()
+
+        mstTypeToGroupsMap = fix.messages.message.filter { message -> message.fieldOrGroupOrComponent != null }
+            .map { message -> message.msgtype to message.fieldOrGroupOrComponent.filterIsInstance<GroupType>() }.toMap()
     }
 
     fun nameToFieldMap(): Map<String, FieldType> {
