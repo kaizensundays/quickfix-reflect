@@ -65,6 +65,7 @@ class NewOrderSingleConverterTest : GenericFixMessageConverterTestSupport() {
                 assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
 
                 assertEquals(getChar(Side.FIELD), obj.side)
+                assertEquals(getDouble(OrderQty.FIELD), obj.orderQty)
                 assertEquals(getString(Symbol.FIELD), obj.symbol)
             }
         }

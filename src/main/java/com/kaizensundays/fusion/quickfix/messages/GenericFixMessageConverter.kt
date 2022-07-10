@@ -101,19 +101,28 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
+    val setDoubleField: SetField = { field, tag, msg ->
+        if (msg.isSetField(tag)) {
+            val value = msg.getDouble(tag)
+            if (!field.isFinal()) {
+                field.set(this, value)
+            }
+        }
+    }
 
     val setTagMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: Any) -> Unit> = mapOf(
         Character::class.java to setCharTag,
         String::class.java to setStringTag,
         Integer::class.java to setIntTag,
         java.lang.Long::class.java to setLongTag,
-        java.lang.Double::class.java to setDoubleTag
+        java.lang.Double::class.java to setDoubleTag,
     )
 
     private val setFieldMap: Map<Class<*>, SetField> = mapOf(
         Character::class.java to setCharField,
         String::class.java to setStringField,
         Integer::class.java to setIntField,
+        java.lang.Double::class.java to setDoubleField,
     )
 
     private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
