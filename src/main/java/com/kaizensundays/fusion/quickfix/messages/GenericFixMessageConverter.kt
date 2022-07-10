@@ -33,7 +33,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         componentToGroupMap[component.javaClass]?.invoke()
     }
 
-    private fun Any.getAndSet(field: Field, set: (Any) -> Unit) {
+    private fun Any.getValue(field: Field, set: (Any) -> Unit) {
         val value = field.get(this)
         if (value != null) {
             set(value)
@@ -41,36 +41,15 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     }
 
     val setCharTag: SetTag = { tag, field, obj ->
-        val value = field.get(obj)
-        if (value != null) {
-            this.setChar(tag, field.get(obj) as Char)
-        }
-    }
-
-    val setStringField: SetField = { field, tag, msg ->
-        if (msg.isSetField(tag)) {
-            val value = msg.getString(tag)
-            if (!field.isFinal()) {
-                field.set(this, value)
-            }
-        }
+        obj.getValue(field) { value -> this.setChar(tag, value as Char) }
     }
 
     private val setStringTag: SetTag = { tag, field, obj ->
-        obj.getAndSet(field) { value -> this.setString(tag, value as String) }
-    }
-
-    val setIntField: SetField = { field, tag, msg ->
-        if (msg.isSetField(tag)) {
-            val value = msg.getInt(tag)
-            if (!field.isFinal()) {
-                field.set(this, value)
-            }
-        }
+        obj.getValue(field) { value -> this.setString(tag, value as String) }
     }
 
     private val setIntTag: SetTag = { tag, field, obj ->
-        obj.getAndSet(field) { value -> this.setInt(tag, value as Int) }
+        obj.getValue(field) { value -> this.setInt(tag, value as Int) }
     }
 
     val setLongTag: SetTag = { tag, field, obj ->
@@ -89,11 +68,29 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     }
 
     val setDoubleTag: SetTag = { tag, field, obj ->
-        val value = field.get(obj)
-        if (value != null) {
-            this.setDouble(tag, field.get(obj) as Double)
+        obj.getValue(field) { value -> this.setDouble(tag, value as Double) }
+    }
+
+
+    val setStringField: SetField = { field, tag, msg ->
+        if (msg.isSetField(tag)) {
+            val value = msg.getString(tag)
+            if (!field.isFinal()) {
+                field.set(this, value)
+            }
         }
     }
+
+
+    val setIntField: SetField = { field, tag, msg ->
+        if (msg.isSetField(tag)) {
+            val value = msg.getInt(tag)
+            if (!field.isFinal()) {
+                field.set(this, value)
+            }
+        }
+    }
+
 
     val setTagMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: Any) -> Unit> = mapOf(
         Character::class.java to setCharTag,
