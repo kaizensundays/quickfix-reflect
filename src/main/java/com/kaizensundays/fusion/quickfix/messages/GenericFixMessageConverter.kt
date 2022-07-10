@@ -22,6 +22,7 @@ typealias GroupFactory = () -> Group
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
     private val msgTypeToJavaTypeMap: Map<*, () -> FixMessage> = mapOf(
+        MsgType.ORDER_SINGLE to { NewOrderSingle() },
         MsgType.QUOTE_REQUEST to { QuoteRequest() }
     )
 
@@ -73,6 +74,14 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         obj.getValue(field) { value -> this.setDouble(tag, value as Double) }
     }
 
+    val setCharField: SetField = { field, tag, msg ->
+        if (msg.isSetField(tag)) {
+            val value = msg.getChar(tag)
+            if (!field.isFinal()) {
+                field.set(this, value)
+            }
+        }
+    }
 
     val setStringField: SetField = { field, tag, msg ->
         if (msg.isSetField(tag)) {
@@ -82,7 +91,6 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
             }
         }
     }
-
 
     val setIntField: SetField = { field, tag, msg ->
         if (msg.isSetField(tag)) {
@@ -103,6 +111,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     )
 
     private val setFieldMap: Map<Class<*>, SetField> = mapOf(
+        Character::class.java to setCharField,
         String::class.java to setStringField,
         Integer::class.java to setIntField,
     )

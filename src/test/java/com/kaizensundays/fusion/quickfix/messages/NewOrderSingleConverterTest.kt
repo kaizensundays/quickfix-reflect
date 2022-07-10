@@ -11,6 +11,7 @@ import quickfix.field.Symbol
 import quickfix.field.TargetCompID
 import quickfix.field.TransactTime
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Created: Saturday 6/25/2022, 12:32 PM Eastern Time
@@ -45,5 +46,30 @@ class NewOrderSingleConverterTest : GenericFixMessageConverterTestSupport() {
         }
 
     }
+
+
+    @Test
+    fun toObject() {
+
+        objs.forEachIndexed { i, _ ->
+            val msg = converter.fromObject(objs[i])
+
+            val obj = converter.toObject(msg)
+
+            assertTrue(obj is NewOrderSingle)
+
+            with(msg) {
+                assertEquals(header.getString(BeginString.FIELD), obj.beginString)
+                assertEquals(header.getString(MsgType.FIELD), obj.msgType)
+                assertEquals(header.getString(SenderCompID.FIELD), obj.senderCompID)
+                assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
+
+                assertEquals(getChar(Side.FIELD), obj.side)
+                assertEquals(getString(Symbol.FIELD), obj.symbol)
+            }
+        }
+
+    }
+
 
 }
