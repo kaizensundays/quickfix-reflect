@@ -33,7 +33,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         componentToGroupMap[component.javaClass]?.invoke()
     }
 
-    private fun Any.getValue(field: Field, set: (Any) -> Unit) {
+    private inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
         val value = field.get(this)
         if (value != null) {
             set(value)
@@ -53,16 +53,18 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     }
 
     val setLongTag: SetTag = { tag, field, obj ->
-        when (fixType(tag)) {
-            "UTCTIMESTAMP" -> {
-                val timestamp = field.get(obj) as Long
-                this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
-            }
-            "MONTHYEAR" -> {
-                this.setInt(tag, (field.get(obj) as Long).toInt())
-            }
-            "INT" -> {
-                this.setInt(tag, (field.get(obj) as Long).toInt())
+        obj.getValue(field) { value ->
+            when (fixType(tag)) {
+                "UTCTIMESTAMP" -> {
+                    val timestamp = value as Long
+                    this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
+                }
+                "MONTHYEAR" -> {
+                    this.setInt(tag, (value as Long).toInt())
+                }
+                "INT" -> {
+                    this.setInt(tag, (value as Long).toInt())
+                }
             }
         }
     }
