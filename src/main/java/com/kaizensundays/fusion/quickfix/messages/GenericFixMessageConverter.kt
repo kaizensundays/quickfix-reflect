@@ -103,19 +103,15 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     }
 
     val setLongField: SetField = { field, tag, msg ->
-        if (msg.isSetField(tag)) {
+        if (msg.isSetField(tag) && !field.isFinal()) {
             when (fixType(tag)) {
                 "UTCTIMESTAMP" -> {
                     val value = toEpochMilli(msg.getUtcTimeStamp(tag))
-                    if (!field.isFinal()) {
-                        field.set(this, value)
-                    }
+                    field.set(this, value)
                 }
                 "MONTHYEAR" -> {
                     val value = msg.getInt(tag).toLong()
-                    if (!field.isFinal()) {
-                        field.set(this, value)
-                    }
+                    field.set(this, value)
                 }
             }
         }
