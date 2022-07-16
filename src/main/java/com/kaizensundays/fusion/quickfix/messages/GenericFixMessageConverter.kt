@@ -231,12 +231,13 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 
     override fun toObject(msg: Message): FixMessage {
 
-
         val obj = msgTypeToJavaTypeMap[msg.header.getString(MsgType.FIELD)]?.invoke() ?: throw IllegalStateException()
 
         msg.header.getFields(FixMessage::class.java, obj)
 
         msg.getFields(obj.javaClass, obj)
+
+        val groupTags = dictionary.getGroupTags(msg)
 
         return obj
     }

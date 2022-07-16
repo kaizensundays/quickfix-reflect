@@ -2,6 +2,8 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import org.junit.Before
 import org.junit.Test
+import quickfix.Message
+import quickfix.field.MsgType
 import kotlin.test.assertEquals
 
 /**
@@ -24,6 +26,20 @@ class FixDictionaryTest {
         assertEquals(916, dictionary.nameToFieldMap().size)
 
         assertEquals(916, dictionary.tagToFieldMap().size)
+    }
+
+    fun message(msgType: String): Message {
+        val msg = Message()
+        msg.header.setString(MsgType.FIELD, msgType)
+        return msg
+    }
+
+    @Test
+    fun getGroupTags() {
+
+        assertEquals(sortedSetOf(78, 386, 711), dictionary.getGroupTags(message(MsgType.ORDER_SINGLE)).toSortedSet())
+        assertEquals(sortedSetOf(78, 386, 555, 711), dictionary.getGroupTags(message(MsgType.NEW_ORDER_MULTILEG)).toSortedSet())
+        assertEquals(sortedSetOf(146), dictionary.getGroupTags(message(MsgType.QUOTE_REQUEST)).toSortedSet())
     }
 
 }

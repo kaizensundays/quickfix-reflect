@@ -6,6 +6,8 @@ import com.kaizensundays.fusion.quickfix.fix44.FieldType
 import com.kaizensundays.fusion.quickfix.fix44.FixType
 import com.kaizensundays.fusion.quickfix.fix44.GroupType
 import org.springframework.core.io.ClassPathResource
+import quickfix.Message
+import quickfix.field.MsgType
 import java.io.FileInputStream
 import javax.xml.bind.JAXBContext
 import javax.xml.transform.stream.StreamSource
@@ -20,7 +22,7 @@ class FixDictionary(private val path: String) {
     private var nameToFieldMap: Map<String, FieldType> = emptyMap()
     private var tagToFieldMap: Map<Int, FieldType> = emptyMap()
     private var nameToComponentMap: Map<String, ComponentType> = emptyMap()
-    private var mstTypeToGroupsMap: Map<String, List<GroupType>> = emptyMap()
+    private var msgTypeToGroupsMap: Map<String, List<GroupType>> = emptyMap()
 
     fun init() {
 
@@ -46,7 +48,7 @@ class FixDictionary(private val path: String) {
 
         nameToComponentMap = components.map { c -> c.name to c }.toMap()
 
-        mstTypeToGroupsMap = fix.messages.message.filter { message -> message.fieldOrGroupOrComponent != null }
+        msgTypeToGroupsMap = fix.messages.message.filter { message -> message.fieldOrGroupOrComponent != null }
             .map { message -> message.msgtype to message.fieldOrGroupOrComponent.filterIsInstance<GroupType>() }.toMap()
     }
 
@@ -65,4 +67,22 @@ class FixDictionary(private val path: String) {
     fun hasComponent(name: String): Boolean {
         return nameToComponentMap.containsKey(name.firstCharToUpper())
     }
+
+    fun tag(fieldName: String): Int? {
+        val field = nameToFieldMap[fieldName.firstCharToUpper()]
+        return field?.number?.toInt()
+    }
+
+    fun getGroupTags(msg: Message): Set<Int> {
+        if (msg.header.isSetField(MsgType.FIELD)) {
+            val msgType = msg.header.getString(MsgType.FIELD)
+            val groups = msgTypeToGroupsMap[msgType]
+            if (groups != null) {
+                return groups.map { group -> group.name }
+                    .mapNotNull { name -> tag(name) }.toSortedSet()
+            }
+        }
+        return emptySet()
+    }
+
 }
