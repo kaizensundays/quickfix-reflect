@@ -165,21 +165,6 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
                 this.setTag(tag, field, obj)
             }
 
-        } else if (dictionary.hasComponent(field.name)) {
-            if (field.type.isArray) {
-                val components = field.get(obj) as Array<Any>
-                components.forEach { component ->
-                    val group = groupFactory(component)
-                    if (group != null) {
-                        if (!this.isSetField(group.fieldTag)) {
-                            this.setInt(group.fieldTag, components.size)
-                        }
-                        group.setFields(component.javaClass, component)
-                        this.addGroup(group)
-                    }
-                }
-            }
-            println()
         } else if (field.type.isArray) {
             val array = field.get(obj) as Array<Any>
             array.forEach { component ->
