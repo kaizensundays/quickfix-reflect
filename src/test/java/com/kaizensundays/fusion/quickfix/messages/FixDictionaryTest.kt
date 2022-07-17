@@ -37,6 +37,10 @@ class FixDictionaryTest {
     @Test
     fun getGroupTags() {
 
+        assertEquals(emptySet(), dictionary.getGroupTags(Message()).toSortedSet())
+        assertEquals(emptySet(), dictionary.getGroupTags(message("")).toSortedSet())
+        assertEquals(emptySet(), dictionary.getGroupTags(message("NoSuchMsgType")).toSortedSet())
+
         assertEquals(sortedSetOf(78, 386, 711), dictionary.getGroupTags(message(MsgType.ORDER_SINGLE)).toSortedSet())
         assertEquals(sortedSetOf(78, 386, 555, 711), dictionary.getGroupTags(message(MsgType.NEW_ORDER_MULTILEG)).toSortedSet())
         assertEquals(sortedSetOf(146), dictionary.getGroupTags(message(MsgType.QUOTE_REQUEST)).toSortedSet())

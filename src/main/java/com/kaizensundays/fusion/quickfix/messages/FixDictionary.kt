@@ -9,6 +9,7 @@ import org.springframework.core.io.ClassPathResource
 import quickfix.Message
 import quickfix.field.MsgType
 import java.io.FileInputStream
+import java.util.*
 import javax.xml.bind.JAXBContext
 import javax.xml.transform.stream.StreamSource
 
@@ -23,6 +24,7 @@ class FixDictionary(private val path: String) {
     private var tagToFieldMap: Map<Int, FieldType> = emptyMap()
     private var nameToComponentMap: Map<String, ComponentType> = emptyMap()
     private var msgTypeToGroupsMap: Map<String, List<GroupType>> = emptyMap()
+    private var msgTypeToGroupTagMap: Map<String, SortedSet<Int>> = emptyMap()
 
     fun init() {
 
@@ -50,6 +52,12 @@ class FixDictionary(private val path: String) {
 
         msgTypeToGroupsMap = fix.messages.message.filter { message -> message.fieldOrGroupOrComponent != null }
             .map { message -> message.msgtype to message.fieldOrGroupOrComponent.filterIsInstance<GroupType>() }.toMap()
+
+        msgTypeToGroupTagMap = fix.messages.message.filter { message -> message.fieldOrGroupOrComponent != null }
+            .map { message ->
+                message.msgtype to message.fieldOrGroupOrComponent.filterIsInstance<GroupType>()
+                    .mapNotNull { group -> tag(group.name) }.toSortedSet()
+            }.toMap()
     }
 
     fun nameToFieldMap(): Map<String, FieldType> {
@@ -76,10 +84,9 @@ class FixDictionary(private val path: String) {
     fun getGroupTags(msg: Message): Set<Int> {
         if (msg.header.isSetField(MsgType.FIELD)) {
             val msgType = msg.header.getString(MsgType.FIELD)
-            val groups = msgTypeToGroupsMap[msgType]
-            if (groups != null) {
-                return groups.map { group -> group.name }
-                    .mapNotNull { name -> tag(name) }.toSortedSet()
+            val tags = msgTypeToGroupTagMap[msgType]
+            if (tags != null) {
+                return tags
             }
         }
         return emptySet()
