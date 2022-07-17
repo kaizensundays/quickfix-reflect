@@ -6,6 +6,7 @@ import quickfix.field.LegSymbol
 import quickfix.field.MsgType
 import quickfix.field.NoLegs
 import quickfix.field.NoRelatedSym
+import quickfix.field.QuoteType
 import quickfix.field.SenderCompID
 import quickfix.field.Symbol
 import quickfix.field.TargetCompID
@@ -22,15 +23,18 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
 
     val objs = arrayOf(
         factory.quoteRequest(
-            "ABNB", 2,
+            "ABNB",
+            arrayOf(QuoteRequest.NoRelatedSym(QuoteType.INDICATIVE)),
             arrayOf(InstrumentLeg("ABNB.1", 1), InstrumentLeg("ABNB.2", 3))
         ),
         factory.quoteRequest(
-            "AMZN", 2,
+            "AMZN",
+            arrayOf(QuoteRequest.NoRelatedSym(QuoteType.INDICATIVE)),
             arrayOf(InstrumentLeg("AMZN.1", 1), InstrumentLeg("AMZN.2", 3))
         ),
         factory.quoteRequest(
-            "UBER", 2,
+            "UBER",
+            arrayOf(QuoteRequest.NoRelatedSym(QuoteType.INDICATIVE)),
             arrayOf(InstrumentLeg("UBER.1", 1), InstrumentLeg("UBER.2", 3))
         ),
     )
@@ -57,9 +61,15 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
 
                 assertEquals("2022-07-03T17:11:03", getUtcTimeStamp(TransactTime.FIELD).toString())
 
+                assertEquals(obj.noRelatedSymGroup.size, getInt(NoRelatedSym.FIELD))
+                var groups = msg.getGroups(NoRelatedSym.FIELD)
+                groups.forEachIndexed { i, group ->
+                    assertEquals(obj.noRelatedSymGroup[i].quoteType, group.getInt(QuoteType.FIELD))
+                }
+
                 assertEquals(obj.instrumentLeg.size, getInt(NoLegs.FIELD))
 
-                val groups = msg.getGroups(NoLegs.FIELD)
+                groups = msg.getGroups(NoLegs.FIELD)
                 groups.forEachIndexed { i, group ->
                     assertEquals(obj.instrumentLeg[i].legSymbol, group.getString(LegSymbol.FIELD))
                 }

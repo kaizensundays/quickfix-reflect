@@ -28,6 +28,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     )
 
     private val componentToGroupMap: Map<*, GroupFactory> = mapOf(
+        QuoteRequest.NoRelatedSym::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym() },
         InstrumentLeg::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
     )
 
@@ -179,6 +180,18 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
                 }
             }
             println()
+        } else if (field.type.isArray) {
+            val components = field.get(obj) as Array<Any>
+            components.forEach { component ->
+                val group = groupFactory(component)
+                if (group != null) {
+                    if (!this.isSetField(group.fieldTag)) {
+                        this.setInt(group.fieldTag, components.size)
+                    }
+                    group.setFields(component.javaClass, component)
+                    this.addGroup(group)
+                }
+            }
         }
     }
 
@@ -238,6 +251,13 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         msg.getFields(obj.javaClass, obj)
 
         val groupTags = dictionary.getGroupTags(msg)
+
+        groupTags.forEach { tag ->
+            val groups = msg.getGroups(tag)
+            if (groups != null && groups.isNotEmpty()) {
+                println("")
+            }
+        }
 
         return obj
     }
