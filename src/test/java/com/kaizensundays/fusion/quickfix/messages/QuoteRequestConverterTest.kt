@@ -2,6 +2,7 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import org.junit.Test
 import quickfix.field.BeginString
+import quickfix.field.LegProduct
 import quickfix.field.LegSymbol
 import quickfix.field.MsgType
 import quickfix.field.NoLegs
@@ -82,16 +83,19 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
                 assertEquals("2022-07-03T17:11:03", getUtcTimeStamp(TransactTime.FIELD).toString())
 
                 assertEquals(obj.noRelatedSymGroup.size, getInt(NoRelatedSym.FIELD))
-                var groups = msg.getGroups(NoRelatedSym.FIELD)
+                val groups = msg.getGroups(NoRelatedSym.FIELD)
                 groups.forEachIndexed { i, group ->
                     assertEquals(obj.noRelatedSymGroup[i].quoteType, group.getInt(QuoteType.FIELD))
-                }
 
-                //assertEquals(obj.instrumentLeg.size, getInt(NoLegs.FIELD))
+                    assertEquals(obj.noRelatedSymGroup[i].noLegsGroup.size, group.getInt(NoLegs.FIELD))
+                    val noLegs = group.getGroups(NoLegs.FIELD)
+                    assertEquals(obj.noRelatedSymGroup[i].noLegsGroup.size, noLegs.size)
 
-                groups = msg.getGroups(NoLegs.FIELD)
-                groups.forEachIndexed { i, group ->
-                    assertEquals(obj.instrumentLeg[i].legSymbol, group.getString(LegSymbol.FIELD))
+                    noLegs.forEachIndexed { j, noLeg ->
+                        val noLegsGroup = obj.noRelatedSymGroup[i].noLegsGroup[j]
+                        assertEquals(noLegsGroup.legSymbol, noLeg.getString(LegSymbol.FIELD))
+                        assertEquals(noLegsGroup.legProduct, noLeg.getInt(LegProduct.FIELD))
+                    }
                 }
             }
 

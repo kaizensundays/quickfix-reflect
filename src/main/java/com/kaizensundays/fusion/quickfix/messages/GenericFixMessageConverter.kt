@@ -29,7 +29,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 
     private val componentToGroupMap: Map<*, GroupFactory> = mapOf(
         QuoteRequest.NoRelatedSym::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym() },
-        InstrumentLeg::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
+        QuoteRequest.NoRelatedSym.NoLegs::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
     )
 
     private val groupFactory: (component: Any) -> Group? = { component ->

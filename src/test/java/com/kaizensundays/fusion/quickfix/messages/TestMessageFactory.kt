@@ -36,7 +36,7 @@ class TestMessageFactory {
         obj.symbol = symbol
         obj.noRelatedSym = noRelatedSymGroup.size
         obj.noRelatedSymGroup = noRelatedSymGroup
-        obj.instrumentLeg = instrumentLeg
+        //obj.instrumentLeg = instrumentLeg
 
         obj.transactTime = toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
         return obj;

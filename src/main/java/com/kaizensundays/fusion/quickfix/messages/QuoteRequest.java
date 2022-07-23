@@ -16,7 +16,8 @@ public class QuoteRequest extends FixMessage {
 
     public static class NoRelatedSym {
         public Integer quoteType;
-        public NoLegs[] noLegs;
+        public Integer noLegs;
+        public NoLegs[] noLegsGroup;
 
         public static class NoLegs {
             public String legSymbol;
@@ -34,15 +35,13 @@ public class QuoteRequest extends FixMessage {
         public NoRelatedSym() {
         }
 
-        public NoRelatedSym(Integer quoteType, NoLegs[] noLegs) {
+        public NoRelatedSym(Integer quoteType, NoLegs[] noLegsGroup) {
             this.quoteType = quoteType;
-            this.noLegs = noLegs;
+            this.noLegsGroup = noLegsGroup;
         }
     }
 
     public NoRelatedSym[] noRelatedSymGroup = {};
-
-    public InstrumentLeg[] instrumentLeg = {};
 
     public QuoteRequest() {
         super(MsgType.QUOTE_REQUEST);
