@@ -24,18 +24,38 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
     val objs = arrayOf(
         factory.quoteRequest(
             "ABNB",
-            arrayOf(QuoteRequest.NoRelatedSym(QuoteType.INDICATIVE)),
-            arrayOf(InstrumentLeg("ABNB.1", 1), InstrumentLeg("ABNB.2", 3))
+            arrayOf(
+                QuoteRequest.NoRelatedSym(
+                    QuoteType.INDICATIVE, arrayOf(
+                        QuoteRequest.NoRelatedSym.NoLegs("ABNB.1", 1),
+                        QuoteRequest.NoRelatedSym.NoLegs("ABNB.2", 3),
+                    )
+                )
+            )
         ),
         factory.quoteRequest(
             "AMZN",
-            arrayOf(QuoteRequest.NoRelatedSym(QuoteType.INDICATIVE)),
-            arrayOf(InstrumentLeg("AMZN.1", 1), InstrumentLeg("AMZN.2", 3))
+            arrayOf(
+                QuoteRequest.NoRelatedSym(
+                    QuoteType.INDICATIVE,
+                    arrayOf(
+                        QuoteRequest.NoRelatedSym.NoLegs("AMZN.1", 1),
+                        QuoteRequest.NoRelatedSym.NoLegs("AMZN.2", 3),
+                    )
+                )
+            )
         ),
         factory.quoteRequest(
             "UBER",
-            arrayOf(QuoteRequest.NoRelatedSym(QuoteType.INDICATIVE)),
-            arrayOf(InstrumentLeg("UBER.1", 1), InstrumentLeg("UBER.2", 3))
+            arrayOf(
+                QuoteRequest.NoRelatedSym(
+                    QuoteType.INDICATIVE,
+                    arrayOf(
+                        QuoteRequest.NoRelatedSym.NoLegs("UBER.1", 1),
+                        QuoteRequest.NoRelatedSym.NoLegs("UBER.2", 3),
+                    )
+                )
+            )
         ),
     )
 
@@ -67,7 +87,7 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
                     assertEquals(obj.noRelatedSymGroup[i].quoteType, group.getInt(QuoteType.FIELD))
                 }
 
-                assertEquals(obj.instrumentLeg.size, getInt(NoLegs.FIELD))
+                //assertEquals(obj.instrumentLeg.size, getInt(NoLegs.FIELD))
 
                 groups = msg.getGroups(NoLegs.FIELD)
                 groups.forEachIndexed { i, group ->

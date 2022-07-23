@@ -16,17 +16,27 @@ public class QuoteRequest extends FixMessage {
 
     public static class NoRelatedSym {
         public Integer quoteType;
+        public NoLegs[] noLegs;
 
         public static class NoLegs {
             public String legSymbol;
             public Integer legProduct;
+
+            public NoLegs() {
+            }
+
+            public NoLegs(String legSymbol, Integer legProduct) {
+                this.legSymbol = legSymbol;
+                this.legProduct = legProduct;
+            }
         }
 
         public NoRelatedSym() {
         }
 
-        public NoRelatedSym(Integer quoteType) {
+        public NoRelatedSym(Integer quoteType, NoLegs[] noLegs) {
             this.quoteType = quoteType;
+            this.noLegs = noLegs;
         }
     }
 
