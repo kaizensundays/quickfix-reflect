@@ -10,14 +10,15 @@ import quickfix.field.MsgType;
 public class QuoteRequest extends FixMessage {
 
     public String quoteReqID;
-    public Integer noRelatedSym;
     public String symbol;
     public Long transactTime;
+    public Integer noRelatedSym;
+    public NoRelatedSym[] noRelatedSymGroup = {};
 
     public static class NoRelatedSym {
         public Integer quoteType;
         public Integer noLegs;
-        public NoLegs[] noLegsGroup;
+        public NoLegs[] noLegsGroup = {};
 
         public static class NoLegs {
             public String legSymbol;
@@ -40,8 +41,6 @@ public class QuoteRequest extends FixMessage {
             this.noLegsGroup = noLegsGroup;
         }
     }
-
-    public NoRelatedSym[] noRelatedSymGroup = {};
 
     public QuoteRequest() {
         super(MsgType.QUOTE_REQUEST);
