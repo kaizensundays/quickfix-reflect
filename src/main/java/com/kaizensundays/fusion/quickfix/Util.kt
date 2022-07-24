@@ -21,13 +21,3 @@ fun toLocalDateTime(timestamp: Long): LocalDateTime {
 fun toEpochMilli(ldt: LocalDateTime): Long {
     return ldt.toInstant(ZoneOffset.UTC).toEpochMilli()
 }
-
-
-/*
-val ldt = LocalDateTime.now()
-
-msg.setUtcTimeStamp(TransactTime.FIELD, ldt)
-
-val inst = ldt.toInstant(ZoneOffset.UTC);
-val ts = inst.toEpochMilli()
-*/

@@ -153,6 +153,8 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 
     private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
+    private fun Field.isList() = this.type.equals(List::class.java)
+
     private fun tag(fieldName: String): Int? {
         val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
         return field?.number?.toInt()
@@ -166,14 +168,14 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     fun FieldMap.set(field: Field, obj: Any) {
 
         val tag = tag(field.name)
-        if (tag != null && !field.type.equals(List::class.java)) {
+        if (tag != null && !field.isList()) {
 
             val setTag = setTagMap[field.type]
             if (setTag != null) {
                 this.setTag(tag, field, obj)
             }
 
-        } else if (field.type.equals(List::class.java)) {
+        } else if (field.isList()) {
             val array = field.get(obj) as MutableList<Any>
             array.forEach { component ->
                 val group = groupFactory(component)
@@ -225,12 +227,12 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
             val field = fieldMap[name]
             if (field != null) {
                 val tag = tag(field.name)
-                if (tag != null && !field.type.equals(List::class.java)) {
+                if (tag != null && !field.isList()) {
                     val setField = setFieldMap[field.type]
                     if (setField != null) {
                         obj.setField(field, tag, this)
                     }
-                } else if (tag != null && field.type.equals(List::class.java)) {
+                } else if (tag != null && field.isList()) {
                     if (isSetField(tag)) {
                         val groups = getGroups(tag)
                         groups.forEach { group ->
