@@ -7,6 +7,8 @@ import quickfix.FieldMap
 import quickfix.Group
 import quickfix.Message
 import quickfix.field.MsgType
+import quickfix.field.NoLegs
+import quickfix.field.NoRelatedSym
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
@@ -19,6 +21,7 @@ typealias SetTag = FieldMap.(Int, Field, Any) -> Unit
 typealias SetField = Any.(Field, Int, FieldMap) -> Unit
 
 typealias GroupFactory = () -> Group
+typealias GroupBeanFactory = () -> Any
 
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
@@ -30,6 +33,11 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     private val componentToGroupMap: Map<*, GroupFactory> = mapOf(
         QuoteRequest.NoRelatedSym::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym() },
         QuoteRequest.NoRelatedSym.NoLegs::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
+    )
+
+    private val tagToGroupBeanMap: Map<*, GroupBeanFactory> = mapOf(
+        NoRelatedSym.FIELD to { QuoteRequest.NoRelatedSym() },
+        NoLegs.FIELD to { QuoteRequest.NoRelatedSym.NoLegs() },
     )
 
     private val groupFactory: (component: Any) -> Group? = { component ->
@@ -207,7 +215,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         return msg
     }
 
-    fun FieldMap.getFields(type: Class<*>, obj: FixMessage) {
+    fun FieldMap.getFields(type: Class<*>, obj: Any) {
 
         val fieldMap = type.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
 
@@ -217,10 +225,24 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
             val field = fieldMap[name]
             if (field != null) {
                 val tag = tag(field.name)
-                if (tag != null) {
+                if (tag != null && !field.type.isArray) {
                     val setField = setFieldMap[field.type]
                     if (setField != null) {
                         obj.setField(field, tag, this)
+                    }
+                } else if (tag != null && field.type.isArray) {
+                    if (isSetField(tag)) {
+                        val groups = getGroups(tag)
+                        groups.forEach { group ->
+                            val factory = tagToGroupBeanMap[tag]
+                            if (factory != null) {
+                                val groupBean = factory.invoke()
+                                group.getFields(groupBean.javaClass, groupBean)
+                                val array = field.get(obj) as Array<Any>
+                                //array.add(groupBean)
+                                println()
+                            }
+                        }
                     }
                 }
             }

@@ -119,9 +119,15 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
                 assertEquals(header.getString(SenderCompID.FIELD), obj.senderCompID)
                 assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
 
-                assertEquals(obj.symbol, getString(Symbol.FIELD))
-
+                assertEquals(getString(Symbol.FIELD), obj.symbol)
                 assertEquals(1656868263000, obj.transactTime)
+                assertEquals(getInt(NoRelatedSym.FIELD), obj.noRelatedSym.size)
+                val noRelatedSymGroups = msg.getGroups(NoRelatedSym.FIELD)
+                noRelatedSymGroups.zip(obj.noRelatedSym).forEach { (group, noRelatedSym) ->
+                    assertEquals(group.getInt(QuoteType.FIELD), noRelatedSym.quoteType)
+                    assertEquals(group.getInt(NoLegs.FIELD), noRelatedSym.noLegs.size)
+
+                }
             }
         }
 
