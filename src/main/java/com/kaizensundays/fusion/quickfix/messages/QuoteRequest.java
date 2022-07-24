@@ -12,12 +12,10 @@ public class QuoteRequest extends FixMessage {
     public String quoteReqID;
     public String symbol;
     public Long transactTime;
-    //public Integer noRelatedSym;
     public NoRelatedSym[] noRelatedSym = {};
 
     public static class NoRelatedSym {
         public Integer quoteType;
-        //public Integer noLegs;
         public NoLegs[] noLegs = {};
 
         public static class NoLegs {

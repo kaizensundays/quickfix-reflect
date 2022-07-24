@@ -78,21 +78,20 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
                 assertEquals(obj.targetCompID, header.getString(TargetCompID.FIELD))
 
                 assertEquals(obj.symbol, getString(Symbol.FIELD))
-                //assertEquals(obj.noRelatedSym, getInt(NoRelatedSym.FIELD))
 
                 assertEquals("2022-07-03T17:11:03", getUtcTimeStamp(TransactTime.FIELD).toString())
 
                 assertEquals(obj.noRelatedSym.size, getInt(NoRelatedSym.FIELD))
 
                 val noRelatedSymGroups = msg.getGroups(NoRelatedSym.FIELD)
-                noRelatedSymGroups.zip(obj.noRelatedSym).forEach { (group, noRelatedSym) ->
+                obj.noRelatedSym.zip(noRelatedSymGroups).forEach { (noRelatedSym, group) ->
                     assertEquals(noRelatedSym.quoteType, group.getInt(QuoteType.FIELD))
                     assertEquals(noRelatedSym.noLegs.size, group.getInt(NoLegs.FIELD))
 
                     val noLegsGroups = group.getGroups(NoLegs.FIELD)
                     assertEquals(noRelatedSym.noLegs.size, noLegsGroups.size)
 
-                    noLegsGroups.zip(noRelatedSym.noLegs).forEach { (group, noLegs) ->
+                    noRelatedSym.noLegs.zip(noLegsGroups).forEach { (noLegs, group) ->
                         assertEquals(noLegs.legSymbol, group.getString(LegSymbol.FIELD))
                         assertEquals(noLegs.legProduct, group.getInt(LegProduct.FIELD))
                     }
@@ -121,7 +120,6 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
                 assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
 
                 assertEquals(obj.symbol, getString(Symbol.FIELD))
-                //assertEquals(obj.noRelatedSym, getInt(NoRelatedSym.FIELD))
 
                 assertEquals(1656868263000, obj.transactTime)
             }
