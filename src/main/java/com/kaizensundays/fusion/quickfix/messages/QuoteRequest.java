@@ -2,8 +2,6 @@ package com.kaizensundays.fusion.quickfix.messages;
 
 import quickfix.field.MsgType;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -16,11 +14,11 @@ public class QuoteRequest extends FixMessage {
     public String quoteReqID;
     public String symbol;
     public Long transactTime;
-    public List<NoRelatedSym> noRelatedSym = new ArrayList<>();
+    public List<NoRelatedSym> noRelatedSym;
 
     public static class NoRelatedSym {
         public Integer quoteType;
-        public List<NoLegs> noLegs = new ArrayList<>();
+        public List<NoLegs> noLegs;
 
         public static class NoLegs {
             public String legSymbol;

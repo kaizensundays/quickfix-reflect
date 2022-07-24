@@ -240,9 +240,19 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
                             if (factory != null) {
                                 val groupBean = factory.invoke()
                                 group.getFields(groupBean.javaClass, groupBean)
-                                val list = field.get(obj) as MutableList<Any>
-                                list.add(groupBean)
-                                println()
+                                var list = field.get(obj)
+                                if (list == null) {
+                                    if (field.isFinal()) {
+                                        throw java.lang.IllegalStateException("Field " + field.name + " must not be final")
+                                    }
+                                    list = mutableListOf<Any>()
+                                } else {
+                                    if (list !is MutableList<*>) {
+                                        throw java.lang.IllegalStateException("Field " + field.name + " must be MutableList")
+                                    }
+                                }
+                                (list as MutableList<Any>).add(groupBean)
+                                field.set(obj, list)
                             }
                         }
                     }
