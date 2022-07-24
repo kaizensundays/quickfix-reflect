@@ -26,7 +26,7 @@ class TestMessageFactory {
         return obj;
     }
 
-    fun quoteRequest(symbol: String, noRelatedSym: Array<QuoteRequest.NoRelatedSym>/*, instrumentLeg: Array<InstrumentLeg> = emptyArray() */): QuoteRequest {
+    fun quoteRequest(symbol: String, noRelatedSym: List<QuoteRequest.NoRelatedSym>): QuoteRequest {
         val obj = QuoteRequest()
         obj.beginString = FixVersions.BEGINSTRING_FIX44
         obj.senderCompID = "IB"

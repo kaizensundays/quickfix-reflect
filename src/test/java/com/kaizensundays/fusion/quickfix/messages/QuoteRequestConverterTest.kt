@@ -25,9 +25,9 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
     val objs = arrayOf(
         factory.quoteRequest(
             "ABNB",
-            arrayOf(
+            listOf(
                 QuoteRequest.NoRelatedSym(
-                    QuoteType.INDICATIVE, arrayOf(
+                    QuoteType.INDICATIVE, listOf(
                         QuoteRequest.NoRelatedSym.NoLegs("ABNB.1", 1),
                         QuoteRequest.NoRelatedSym.NoLegs("ABNB.2", 3),
                     )
@@ -36,10 +36,10 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
         ),
         factory.quoteRequest(
             "AMZN",
-            arrayOf(
+            listOf(
                 QuoteRequest.NoRelatedSym(
                     QuoteType.INDICATIVE,
-                    arrayOf(
+                    listOf(
                         QuoteRequest.NoRelatedSym.NoLegs("AMZN.1", 1),
                         QuoteRequest.NoRelatedSym.NoLegs("AMZN.2", 3),
                     )
@@ -48,10 +48,10 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
         ),
         factory.quoteRequest(
             "UBER",
-            arrayOf(
+            listOf(
                 QuoteRequest.NoRelatedSym(
                     QuoteType.INDICATIVE,
-                    arrayOf(
+                    listOf(
                         QuoteRequest.NoRelatedSym.NoLegs("UBER.1", 1),
                         QuoteRequest.NoRelatedSym.NoLegs("UBER.2", 3),
                     )
@@ -126,7 +126,6 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
                 noRelatedSymGroups.zip(obj.noRelatedSym).forEach { (group, noRelatedSym) ->
                     assertEquals(group.getInt(QuoteType.FIELD), noRelatedSym.quoteType)
                     assertEquals(group.getInt(NoLegs.FIELD), noRelatedSym.noLegs.size)
-
                 }
             }
         }

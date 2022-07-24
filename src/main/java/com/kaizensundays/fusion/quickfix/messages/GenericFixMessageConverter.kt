@@ -166,15 +166,15 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     fun FieldMap.set(field: Field, obj: Any) {
 
         val tag = tag(field.name)
-        if (tag != null && !field.type.isArray) {
+        if (tag != null && !field.type.equals(List::class.java)) {
 
             val setTag = setTagMap[field.type]
             if (setTag != null) {
                 this.setTag(tag, field, obj)
             }
 
-        } else if (field.type.isArray) {
-            val array = field.get(obj) as Array<Any>
+        } else if (field.type.equals(List::class.java)) {
+            val array = field.get(obj) as MutableList<Any>
             array.forEach { component ->
                 val group = groupFactory(component)
                 if (group != null) {
@@ -225,12 +225,12 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
             val field = fieldMap[name]
             if (field != null) {
                 val tag = tag(field.name)
-                if (tag != null && !field.type.isArray) {
+                if (tag != null && !field.type.equals(List::class.java)) {
                     val setField = setFieldMap[field.type]
                     if (setField != null) {
                         obj.setField(field, tag, this)
                     }
-                } else if (tag != null && field.type.isArray) {
+                } else if (tag != null && field.type.equals(List::class.java)) {
                     if (isSetField(tag)) {
                         val groups = getGroups(tag)
                         groups.forEach { group ->
@@ -238,8 +238,8 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
                             if (factory != null) {
                                 val groupBean = factory.invoke()
                                 group.getFields(groupBean.javaClass, groupBean)
-                                val array = field.get(obj) as Array<Any>
-                                //array.add(groupBean)
+                                val list = field.get(obj) as MutableList<Any>
+                                list.add(groupBean)
                                 println()
                             }
                         }

@@ -2,6 +2,10 @@ package com.kaizensundays.fusion.quickfix.messages;
 
 import quickfix.field.MsgType;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created: Sunday 7/3/2022, 12:13 PM Eastern Time
  *
@@ -12,11 +16,11 @@ public class QuoteRequest extends FixMessage {
     public String quoteReqID;
     public String symbol;
     public Long transactTime;
-    public NoRelatedSym[] noRelatedSym = {};
+    public List<NoRelatedSym> noRelatedSym = new ArrayList<>();
 
     public static class NoRelatedSym {
         public Integer quoteType;
-        public NoLegs[] noLegs = {};
+        public List<NoLegs> noLegs = new ArrayList<>();
 
         public static class NoLegs {
             public String legSymbol;
@@ -34,7 +38,7 @@ public class QuoteRequest extends FixMessage {
         public NoRelatedSym() {
         }
 
-        public NoRelatedSym(Integer quoteType, NoLegs[] noLegs) {
+        public NoRelatedSym(Integer quoteType, List<NoLegs> noLegs) {
             this.quoteType = quoteType;
             this.noLegs = noLegs;
         }
