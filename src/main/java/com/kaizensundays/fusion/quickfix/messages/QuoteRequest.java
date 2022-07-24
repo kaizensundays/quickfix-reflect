@@ -12,13 +12,13 @@ public class QuoteRequest extends FixMessage {
     public String quoteReqID;
     public String symbol;
     public Long transactTime;
-    public Integer noRelatedSym;
-    public NoRelatedSym[] noRelatedSymGroup = {};
+    //public Integer noRelatedSym;
+    public NoRelatedSym[] noRelatedSym = {};
 
     public static class NoRelatedSym {
         public Integer quoteType;
-        public Integer noLegs;
-        public NoLegs[] noLegsGroup = {};
+        //public Integer noLegs;
+        public NoLegs[] noLegs = {};
 
         public static class NoLegs {
             public String legSymbol;
@@ -36,9 +36,9 @@ public class QuoteRequest extends FixMessage {
         public NoRelatedSym() {
         }
 
-        public NoRelatedSym(Integer quoteType, NoLegs[] noLegsGroup) {
+        public NoRelatedSym(Integer quoteType, NoLegs[] noLegs) {
             this.quoteType = quoteType;
-            this.noLegsGroup = noLegsGroup;
+            this.noLegs = noLegs;
         }
     }
 

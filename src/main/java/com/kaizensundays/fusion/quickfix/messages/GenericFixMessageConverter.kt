@@ -158,7 +158,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     fun FieldMap.set(field: Field, obj: Any) {
 
         val tag = tag(field.name)
-        if (tag != null) {
+        if (tag != null && !field.type.isArray) {
 
             val setTag = setTagMap[field.type]
             if (setTag != null) {

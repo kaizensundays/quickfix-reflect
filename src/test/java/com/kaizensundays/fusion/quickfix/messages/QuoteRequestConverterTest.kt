@@ -78,21 +78,21 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
                 assertEquals(obj.targetCompID, header.getString(TargetCompID.FIELD))
 
                 assertEquals(obj.symbol, getString(Symbol.FIELD))
-                assertEquals(obj.noRelatedSym, getInt(NoRelatedSym.FIELD))
+                //assertEquals(obj.noRelatedSym, getInt(NoRelatedSym.FIELD))
 
                 assertEquals("2022-07-03T17:11:03", getUtcTimeStamp(TransactTime.FIELD).toString())
 
-                assertEquals(obj.noRelatedSymGroup.size, getInt(NoRelatedSym.FIELD))
+                assertEquals(obj.noRelatedSym.size, getInt(NoRelatedSym.FIELD))
                 val groups = msg.getGroups(NoRelatedSym.FIELD)
                 groups.forEachIndexed { i, group ->
-                    assertEquals(obj.noRelatedSymGroup[i].quoteType, group.getInt(QuoteType.FIELD))
+                    assertEquals(obj.noRelatedSym[i].quoteType, group.getInt(QuoteType.FIELD))
 
-                    assertEquals(obj.noRelatedSymGroup[i].noLegsGroup.size, group.getInt(NoLegs.FIELD))
+                    assertEquals(obj.noRelatedSym[i].noLegs.size, group.getInt(NoLegs.FIELD))
                     val noLegs = group.getGroups(NoLegs.FIELD)
-                    assertEquals(obj.noRelatedSymGroup[i].noLegsGroup.size, noLegs.size)
+                    assertEquals(obj.noRelatedSym[i].noLegs.size, noLegs.size)
 
                     noLegs.forEachIndexed { j, noLeg ->
-                        val noLegsGroup = obj.noRelatedSymGroup[i].noLegsGroup[j]
+                        val noLegsGroup = obj.noRelatedSym[i].noLegs[j]
                         assertEquals(noLegsGroup.legSymbol, noLeg.getString(LegSymbol.FIELD))
                         assertEquals(noLegsGroup.legProduct, noLeg.getInt(LegProduct.FIELD))
                     }
@@ -120,7 +120,7 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
                 assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
 
                 assertEquals(obj.symbol, getString(Symbol.FIELD))
-                assertEquals(obj.noRelatedSym, getInt(NoRelatedSym.FIELD))
+                //assertEquals(obj.noRelatedSym, getInt(NoRelatedSym.FIELD))
 
                 assertEquals(1656868263000, obj.transactTime)
             }
