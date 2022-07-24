@@ -83,20 +83,21 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
                 assertEquals("2022-07-03T17:11:03", getUtcTimeStamp(TransactTime.FIELD).toString())
 
                 assertEquals(obj.noRelatedSym.size, getInt(NoRelatedSym.FIELD))
-                val groups = msg.getGroups(NoRelatedSym.FIELD)
-                groups.forEachIndexed { i, group ->
-                    assertEquals(obj.noRelatedSym[i].quoteType, group.getInt(QuoteType.FIELD))
 
-                    assertEquals(obj.noRelatedSym[i].noLegs.size, group.getInt(NoLegs.FIELD))
-                    val noLegs = group.getGroups(NoLegs.FIELD)
-                    assertEquals(obj.noRelatedSym[i].noLegs.size, noLegs.size)
+                val noRelatedSymGroups = msg.getGroups(NoRelatedSym.FIELD)
+                noRelatedSymGroups.zip(obj.noRelatedSym).forEach { (group, noRelatedSym) ->
+                    assertEquals(noRelatedSym.quoteType, group.getInt(QuoteType.FIELD))
+                    assertEquals(noRelatedSym.noLegs.size, group.getInt(NoLegs.FIELD))
 
-                    noLegs.forEachIndexed { j, noLeg ->
-                        val noLegsGroup = obj.noRelatedSym[i].noLegs[j]
-                        assertEquals(noLegsGroup.legSymbol, noLeg.getString(LegSymbol.FIELD))
-                        assertEquals(noLegsGroup.legProduct, noLeg.getInt(LegProduct.FIELD))
+                    val noLegsGroups = group.getGroups(NoLegs.FIELD)
+                    assertEquals(noRelatedSym.noLegs.size, noLegsGroups.size)
+
+                    noLegsGroups.zip(noRelatedSym.noLegs).forEach { (group, noLegs) ->
+                        assertEquals(noLegs.legSymbol, group.getString(LegSymbol.FIELD))
+                        assertEquals(noLegs.legProduct, group.getInt(LegProduct.FIELD))
                     }
                 }
+
             }
 
         }
