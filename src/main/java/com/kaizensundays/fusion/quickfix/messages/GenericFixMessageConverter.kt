@@ -176,6 +176,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
             }
 
         } else if (field.isList()) {
+            @Suppress("UNCHECKED_CAST")
             val array = field.get(obj) as MutableList<Any>
             array.forEach { component ->
                 val group = groupFactory(component)
@@ -230,6 +231,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
                 throw java.lang.IllegalStateException("Field " + this.name + " must be MutableList")
             }
         }
+        @Suppress("UNCHECKED_CAST")
         return list as MutableList<Any>
     }
 
