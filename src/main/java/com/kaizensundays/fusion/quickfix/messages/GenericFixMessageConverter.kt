@@ -217,6 +217,21 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         return msg
     }
 
+    fun Field.getGroups(obj: Any): MutableList<Any> {
+        var list = this.get(obj)
+        if (list == null) {
+            if (this.isFinal()) {
+                throw java.lang.IllegalStateException("Field " + this.name + " must not be final")
+            }
+            list = mutableListOf<Any>()
+        } else {
+            if (list !is MutableList<*>) {
+                throw java.lang.IllegalStateException("Field " + this.name + " must be MutableList")
+            }
+        }
+        return list as MutableList<Any>
+    }
+
     fun FieldMap.getFields(type: Class<*>, obj: Any) {
 
         val fieldMap = type.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
@@ -240,6 +255,8 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
                             if (factory != null) {
                                 val groupBean = factory.invoke()
                                 group.getFields(groupBean.javaClass, groupBean)
+                                //
+/*
                                 var list = field.get(obj)
                                 if (list == null) {
                                     if (field.isFinal()) {
@@ -251,7 +268,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
                                         throw java.lang.IllegalStateException("Field " + field.name + " must be MutableList")
                                     }
                                 }
-                                (list as MutableList<Any>).add(groupBean)
+*/
+                                val list = field.getGroups(obj)
+                                list.add(groupBean)
                                 field.set(obj, list)
                             }
                         }
