@@ -2,6 +2,7 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import org.junit.Test
 import quickfix.field.QuoteType
+import quickfix.field.Side
 import kotlin.test.assertEquals
 
 /**
@@ -13,7 +14,13 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
 
     val fo = FromObject()
 
-    val objs = arrayOf(
+    val newOrderSingles = arrayOf(
+        factory.newOrderSingle(Side.BUY, 100.0, "ABNB"),
+        factory.newOrderSingle(Side.SELL, 300.0, "AMZN"),
+        factory.newOrderSingle(Side.BUY, 700.0, "UBER"),
+    )
+
+    val quoteRequests = arrayOf(
         factory.quoteRequest(
             "ABNB",
             listOf(
@@ -52,16 +59,29 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
     )
 
     @Test
-    fun walk() {
+    fun walkNewOrderSingle() {
 
         val names = mutableListOf<String>()
 
-        fo.walk(objs[0]) { field ->
+        fo.walk(newOrderSingles[0]) { field ->
             println(field.name)
             names.add(field.name)
         }
 
-        assertEquals("[quoteReqID, symbol, transactTime, quoteType, legSymbol, legProduct, legSymbol, legProduct]", names.toString())
+        assertEquals("[msgType, beginString, senderCompID, targetCompID, side, orderQty, symbol, maturityMonthYear, transactTime]", names.toString())
+    }
+
+    @Test
+    fun walkQuoteRequest() {
+
+        val names = mutableListOf<String>()
+
+        fo.walk(quoteRequests[0]) { field ->
+            println(field.name)
+            names.add(field.name)
+        }
+
+        assertEquals("[msgType, beginString, senderCompID, targetCompID, quoteReqID, symbol, transactTime, quoteType, legSymbol, legProduct, legSymbol, legProduct]", names.toString())
 
     }
 

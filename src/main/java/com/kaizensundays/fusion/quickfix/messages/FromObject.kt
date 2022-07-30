@@ -13,20 +13,28 @@ class FromObject {
 
     private fun Field.isList() = this.type.equals(List::class.java)
 
-    fun walk(obj: Any, fieldAction: (field: Field) -> Unit) {
+    private fun walkObj(type: Class<*>, obj: Any, fieldAction: (field: Field) -> Unit) {
 
-        val fields = obj.javaClass.declaredFields
+        val fields = type.declaredFields
 
         fields.forEach { f ->
             if (f.isList()) {
                 val list = f.get(obj) as MutableList<Any>
                 list.forEach { e ->
-                    walk(e, fieldAction)
+                    walkObj(e.javaClass, e, fieldAction)
                 }
             } else {
                 fieldAction.invoke(f)
             }
         }
+
+    }
+
+    fun walk(obj: FixMessage, fieldAction: (field: Field) -> Unit) {
+
+        walkObj(FixMessage::class.java, obj, fieldAction)
+
+        walkObj(obj.javaClass, obj, fieldAction)
 
     }
 
