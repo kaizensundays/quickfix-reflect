@@ -18,13 +18,13 @@ class FromObject {
         val fields = type.declaredFields
 
         fields.forEach { f ->
-            if (f.isList()) {
+            if (!f.isList()) {
+                fieldAction.invoke(f)
+            } else {
                 val list = f.get(obj) as MutableList<Any>
                 list.forEach { e ->
                     walkObj(e.javaClass, e, fieldAction)
                 }
-            } else {
-                fieldAction.invoke(f)
             }
         }
 
