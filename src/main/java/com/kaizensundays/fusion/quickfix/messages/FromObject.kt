@@ -1,6 +1,6 @@
 package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.firstCharToUpper
+import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import quickfix.Message
 import java.lang.reflect.Field
@@ -13,10 +13,58 @@ import java.lang.reflect.Field
  */
 class FromObject(private val dictionary: FixDictionary) {
 
-    private fun tag(fieldName: String): Int? {
-        val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
-        return field?.number?.toInt()
+    private inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
+        val value = field.get(this)
+        if (value != null) {
+            set(value)
+        }
     }
+
+    private val setCharTag: SetTag = { tag, field, obj ->
+        obj.getValue(field) { value -> this.setChar(tag, value as Char) }
+    }
+
+    private val setStringTag: SetTag = { tag, field, obj ->
+        obj.getValue(field) { value -> this.setString(tag, value as String) }
+    }
+
+    private val setIntTag: SetTag = { tag, field, obj ->
+        obj.getValue(field) { value -> this.setInt(tag, value as Int) }
+    }
+
+    fun fixType(tag: Int): String {
+        val field = dictionary.tagToFieldMap()[tag]
+        return if (field != null) field.type else "?"
+    }
+
+    val setLongTag: SetTag = { tag, field, obj ->
+        obj.getValue(field) { value ->
+            when (fixType(tag)) {
+                "UTCTIMESTAMP" -> {
+                    val timestamp = value as Long
+                    this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
+                }
+                "MONTHYEAR" -> {
+                    this.setInt(tag, (value as Long).toInt())
+                }
+                "INT" -> {
+                    this.setInt(tag, (value as Long).toInt())
+                }
+            }
+        }
+    }
+
+    val setDoubleTag: SetTag = { tag, field, obj ->
+        obj.getValue(field) { value -> this.setDouble(tag, value as Double) }
+    }
+
+    private val setTagMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: Any) -> Unit> = mapOf(
+        Character::class.java to setCharTag,
+        String::class.java to setStringTag,
+        Integer::class.java to setIntTag,
+        java.lang.Long::class.java to setLongTag,
+        java.lang.Double::class.java to setDoubleTag,
+    )
 
     private fun Field.isList() = this.type.equals(List::class.java)
 
@@ -25,7 +73,10 @@ class FromObject(private val dictionary: FixDictionary) {
         if (value != null) {
             val tag = dictionary.tag(field.name)
             if (tag != null) {
-                target.setString(tag, value as String)
+                val setTag = setTagMap[field.type]
+                if (setTag != null) {
+                    target.setTag(tag, field, obj)
+                }
             }
         }
     }

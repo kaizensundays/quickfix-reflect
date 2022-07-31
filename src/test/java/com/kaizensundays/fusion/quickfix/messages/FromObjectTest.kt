@@ -2,11 +2,15 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import org.junit.Test
 import quickfix.Message
+import quickfix.field.MaturityMonthYear
 import quickfix.field.MsgType
+import quickfix.field.OrderQty
 import quickfix.field.QuoteType
 import quickfix.field.SenderCompID
 import quickfix.field.Side
+import quickfix.field.Symbol
 import quickfix.field.TargetCompID
+import quickfix.field.TransactTime
 import kotlin.test.assertEquals
 
 /**
@@ -65,15 +69,27 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
     @Test
     fun fieldCopyTo() {
 
+        val obj = newOrderSingles[0]
         val msg = Message()
 
         FixMessage::class.java.declaredFields.forEach { f ->
-            fo.fieldCopyTo(f, newOrderSingles[0], msg)
+            fo.fieldCopyTo(f, obj, msg)
         }
 
         assertEquals(MsgType.ORDER_SINGLE, msg.getString(MsgType.FIELD))
-        assertEquals("IB", msg.getString(SenderCompID.FIELD))
-        assertEquals("CBOE", msg.getString(TargetCompID.FIELD))
+        assertEquals(obj.senderCompID, msg.getString(SenderCompID.FIELD))
+        assertEquals(obj.targetCompID, msg.getString(TargetCompID.FIELD))
+
+        NewOrderSingle::class.java.declaredFields.forEach { f ->
+            fo.fieldCopyTo(f, obj, msg)
+        }
+
+        assertEquals(obj.side, msg.getChar(Side.FIELD))
+        assertEquals(obj.orderQty, msg.getDouble(OrderQty.FIELD))
+        assertEquals(obj.symbol, msg.getString(Symbol.FIELD))
+
+        assertEquals(obj.maturityMonthYear.toInt(), msg.getInt(MaturityMonthYear.FIELD))
+        assertEquals("2022-07-03T17:11:03", msg.getUtcTimeStamp(TransactTime.FIELD).toString())
     }
 
     @Test
