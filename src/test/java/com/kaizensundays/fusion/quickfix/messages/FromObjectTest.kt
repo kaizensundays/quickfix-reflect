@@ -4,7 +4,9 @@ import org.junit.Test
 import quickfix.Message
 import quickfix.field.MaturityMonthYear
 import quickfix.field.MsgType
+import quickfix.field.NoRelatedSym
 import quickfix.field.OrderQty
+import quickfix.field.QuoteReqID
 import quickfix.field.QuoteType
 import quickfix.field.SenderCompID
 import quickfix.field.Side
@@ -67,7 +69,7 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
     )
 
     @Test
-    fun fieldCopyTo() {
+    fun fieldCopyToNewOrderSingle() {
 
         val obj = newOrderSingles[0]
         val msg = Message()
@@ -90,6 +92,31 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
 
         assertEquals(obj.maturityMonthYear.toInt(), msg.getInt(MaturityMonthYear.FIELD))
         assertEquals("2022-07-03T17:11:03", msg.getUtcTimeStamp(TransactTime.FIELD).toString())
+    }
+
+    @Test
+    fun fieldCopyToQuoteRequest() {
+
+        val obj = quoteRequests[0]
+        val msg = Message()
+
+        FixMessage::class.java.declaredFields.forEach { f ->
+            fo.fieldCopyTo(f, obj, msg)
+        }
+
+        assertEquals(MsgType.QUOTE_REQUEST, msg.getString(MsgType.FIELD))
+        assertEquals(obj.senderCompID, msg.getString(SenderCompID.FIELD))
+        assertEquals(obj.targetCompID, msg.getString(TargetCompID.FIELD))
+
+        QuoteRequest::class.java.declaredFields.forEach { f ->
+            fo.fieldCopyTo(f, obj, msg)
+        }
+
+        assertEquals(obj.quoteReqID, msg.getString(QuoteReqID.FIELD))
+        assertEquals(obj.symbol, msg.getString(Symbol.FIELD))
+        assertEquals("2022-07-03T17:11:03", msg.getUtcTimeStamp(TransactTime.FIELD).toString())
+
+        assertEquals(obj.noRelatedSym.size, msg.getInt(NoRelatedSym.FIELD))
     }
 
     @Test

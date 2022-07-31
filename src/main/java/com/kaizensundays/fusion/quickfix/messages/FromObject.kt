@@ -2,6 +2,7 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
+import quickfix.Group
 import quickfix.Message
 import java.lang.reflect.Field
 
@@ -68,15 +69,40 @@ class FromObject(private val dictionary: FixDictionary) {
 
     private fun Field.isList() = this.type.equals(List::class.java)
 
+    private val componentToGroupMap: Map<*, GroupFactory> = mapOf(
+        QuoteRequest.NoRelatedSym::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym() },
+        QuoteRequest.NoRelatedSym.NoLegs::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
+    )
+
+    private val groupFactory: (component: Any) -> Group? = { component ->
+        componentToGroupMap[component.javaClass]?.invoke()
+    }
+
+    private fun listCopyTo(field: Field, obj: Any, target: FieldMap) {
+        val list = field.get(obj) as MutableList<Any>
+        list.forEach { component ->
+            val group = groupFactory(component)
+            if (group != null) {
+                if (!target.isSetField(group.fieldTag)) {
+                    target.setInt(group.fieldTag, list.size)
+                }
+                //group.setFields(component.javaClass, component)
+                target.addGroup(group)
+            }
+        }
+    }
+
     fun fieldCopyTo(field: Field, obj: Any, target: FieldMap) {
         val value = field.get(obj)
         if (value != null) {
             val tag = dictionary.tag(field.name)
-            if (tag != null) {
+            if (tag != null && !field.isList()) {
                 val setTag = setTagMap[field.type]
                 if (setTag != null) {
                     target.setTag(tag, field, obj)
                 }
+            } else if (field.isList()) {
+                listCopyTo(field, obj, target)
             }
         }
     }
