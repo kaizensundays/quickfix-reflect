@@ -2,7 +2,6 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
-import quickfix.Group
 import quickfix.Message
 import java.lang.reflect.Field
 
@@ -70,14 +69,16 @@ class FromObject(private val dictionary: FixDictionary) {
     private fun Field.isList() = this.type.equals(List::class.java)
 
     private fun listCopyTo(field: Field, obj: Any, target: FieldMap) {
-        val list = field.get(obj) as MutableList<FixGroup>
-        list.forEach { fixGroup ->
-            val group = fixGroup.create()
-            if (!target.isSetField(group.fieldTag)) {
-                target.setInt(group.fieldTag, list.size)
+        val list = field.get(obj)
+        if (list is List<*>) {
+            list.filterIsInstance<FixGroup>().forEach { fixGroup ->
+                val group = fixGroup.create()
+                if (!target.isSetField(group.fieldTag)) {
+                    target.setInt(group.fieldTag, list.size)
+                }
+                //group.setFields(component.javaClass, component)
+                target.addGroup(group)
             }
-            //group.setFields(component.javaClass, component)
-            target.addGroup(group)
         }
     }
 
