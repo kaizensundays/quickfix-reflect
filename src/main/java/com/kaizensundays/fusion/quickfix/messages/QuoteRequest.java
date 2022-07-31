@@ -1,5 +1,7 @@
 package com.kaizensundays.fusion.quickfix.messages;
 
+import org.jetbrains.annotations.NotNull;
+import quickfix.Group;
 import quickfix.field.MsgType;
 
 import java.util.List;
@@ -16,11 +18,23 @@ public class QuoteRequest extends FixMessage {
     public Long transactTime;
     public List<NoRelatedSym> noRelatedSym;
 
-    public static class NoRelatedSym {
+    public static class NoRelatedSym implements FixGroup {
+        @NotNull
+        @Override
+        public Group create() {
+            return new quickfix.fix44.QuoteRequest.NoRelatedSym();
+        }
+
         public Integer quoteType;
         public List<NoLegs> noLegs;
 
-        public static class NoLegs {
+        public static class NoLegs implements FixGroup {
+            @NotNull
+            @Override
+            public Group create() {
+                return new quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs();
+            }
+
             public String legSymbol;
             public Integer legProduct;
 
@@ -31,6 +45,7 @@ public class QuoteRequest extends FixMessage {
                 this.legSymbol = legSymbol;
                 this.legProduct = legProduct;
             }
+
         }
 
         public NoRelatedSym() {

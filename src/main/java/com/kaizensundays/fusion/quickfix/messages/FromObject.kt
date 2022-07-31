@@ -69,26 +69,15 @@ class FromObject(private val dictionary: FixDictionary) {
 
     private fun Field.isList() = this.type.equals(List::class.java)
 
-    private val componentToGroupMap: Map<*, GroupFactory> = mapOf(
-        QuoteRequest.NoRelatedSym::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym() },
-        QuoteRequest.NoRelatedSym.NoLegs::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
-    )
-
-    private val groupFactory: (component: Any) -> Group? = { component ->
-        componentToGroupMap[component.javaClass]?.invoke()
-    }
-
     private fun listCopyTo(field: Field, obj: Any, target: FieldMap) {
-        val list = field.get(obj) as MutableList<Any>
-        list.forEach { component ->
-            val group = groupFactory(component)
-            if (group != null) {
-                if (!target.isSetField(group.fieldTag)) {
-                    target.setInt(group.fieldTag, list.size)
-                }
-                //group.setFields(component.javaClass, component)
-                target.addGroup(group)
+        val list = field.get(obj) as MutableList<FixGroup>
+        list.forEach { fixGroup ->
+            val group = fixGroup.create()
+            if (!target.isSetField(group.fieldTag)) {
+                target.setInt(group.fieldTag, list.size)
             }
+            //group.setFields(component.javaClass, component)
+            target.addGroup(group)
         }
     }
 
