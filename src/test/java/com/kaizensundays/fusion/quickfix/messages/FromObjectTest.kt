@@ -1,8 +1,12 @@
 package com.kaizensundays.fusion.quickfix.messages
 
 import org.junit.Test
+import quickfix.Message
+import quickfix.field.MsgType
 import quickfix.field.QuoteType
+import quickfix.field.SenderCompID
 import quickfix.field.Side
+import quickfix.field.TargetCompID
 import kotlin.test.assertEquals
 
 /**
@@ -12,7 +16,7 @@ import kotlin.test.assertEquals
  */
 class FromObjectTest : GenericFixMessageConverterTestSupport() {
 
-    val fo = FromObject()
+    val fo = FromObject(dictionary)
 
     val newOrderSingles = arrayOf(
         factory.newOrderSingle(Side.BUY, 100.0, "ABNB"),
@@ -57,6 +61,20 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
             )
         ),
     )
+
+    @Test
+    fun fieldCopyTo() {
+
+        val msg = Message()
+
+        FixMessage::class.java.declaredFields.forEach { f ->
+            fo.fieldCopyTo(f, newOrderSingles[0], msg)
+        }
+
+        assertEquals(MsgType.ORDER_SINGLE, msg.getString(MsgType.FIELD))
+        assertEquals("IB", msg.getString(SenderCompID.FIELD))
+        assertEquals("CBOE", msg.getString(TargetCompID.FIELD))
+    }
 
     @Test
     fun walkNewOrderSingle() {

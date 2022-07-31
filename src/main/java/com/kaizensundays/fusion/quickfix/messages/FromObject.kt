@@ -1,5 +1,7 @@
 package com.kaizensundays.fusion.quickfix.messages
 
+import com.kaizensundays.fusion.quickfix.firstCharToUpper
+import quickfix.FieldMap
 import quickfix.Message
 import java.lang.reflect.Field
 
@@ -9,9 +11,24 @@ import java.lang.reflect.Field
  *
  * @author Sergey Chuykov
  */
-class FromObject {
+class FromObject(private val dictionary: FixDictionary) {
+
+    private fun tag(fieldName: String): Int? {
+        val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
+        return field?.number?.toInt()
+    }
 
     private fun Field.isList() = this.type.equals(List::class.java)
+
+    fun fieldCopyTo(field: Field, obj: Any, target: FieldMap) {
+        val value = field.get(obj)
+        if (value != null) {
+            val tag = dictionary.tag(field.name)
+            if (tag != null) {
+                target.setString(tag, value as String)
+            }
+        }
+    }
 
     private fun walkObj(type: Class<*>, obj: Any, action: (field: Field) -> Unit) {
 
