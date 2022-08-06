@@ -137,30 +137,4 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
 
     }
 
-/*
-    @Test
-    fun walkNewOrderSingle() {
-
-        val names = mutableListOf<String>()
-
-        fo.walk(newOrderSingles[0]) { field ->
-            names.add(field.name)
-        }
-
-        assertEquals("[msgType, beginString, senderCompID, targetCompID, side, orderQty, symbol, maturityMonthYear, transactTime]", names.toString())
-    }
-
-    @Test
-    fun walkQuoteRequest() {
-
-        val names = mutableListOf<String>()
-
-        fo.walk(quoteRequests[0]) { field ->
-            names.add(field.name)
-        }
-
-        assertEquals("[msgType, beginString, senderCompID, targetCompID, quoteReqID, symbol, transactTime, quoteType, legSymbol, legProduct, legSymbol, legProduct]", names.toString())
-    }
-*/
-
 }

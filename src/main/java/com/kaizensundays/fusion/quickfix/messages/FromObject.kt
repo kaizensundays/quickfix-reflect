@@ -5,7 +5,6 @@ import quickfix.FieldMap
 import quickfix.Message
 import java.lang.reflect.Field
 
-
 /**
  * Created: Saturday 7/30/2022, 12:55 PM Eastern Time
  *
@@ -99,38 +98,6 @@ class FromObject(private val dictionary: FixDictionary) {
             }
         }
     }
-/*
-
-    private fun walkObj(type: Class<*>, obj: Any, action: (field: Field) -> Unit) {
-
-        val fields = type.declaredFields
-
-        fields.forEach { f ->
-            action.invoke(f)
-*/
-/*
-            if (!f.isList()) {
-                action.invoke(f)
-            } else {
-                val list = f.get(obj) as MutableList<Any>
-                list.forEach { e ->
-                    walkObj(e.javaClass, e, action)
-                }
-            }
-*//*
-
-        }
-
-    }
-
-    fun walk(obj: FixMessage, fieldAction: (field: Field) -> Unit) {
-
-        walkObj(FixMessage::class.java, obj, fieldAction)
-
-        walkObj(obj.javaClass, obj, fieldAction)
-
-    }
-*/
 
     fun fromObject(obj: FixMessage): Message {
         val msg = Message()
