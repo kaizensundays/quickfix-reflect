@@ -76,7 +76,10 @@ class FromObject(private val dictionary: FixDictionary) {
                 if (!target.isSetField(group.fieldTag)) {
                     target.setInt(group.fieldTag, list.size)
                 }
-                //group.setFields(component.javaClass, component)
+                val fields = fixGroup.javaClass.declaredFields
+                fields.forEach { field ->
+                    fieldCopyTo(field, fixGroup, group)
+                }
                 target.addGroup(group)
             }
         }

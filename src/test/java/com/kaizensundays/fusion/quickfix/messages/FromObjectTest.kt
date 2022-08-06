@@ -2,8 +2,11 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import org.junit.Test
 import quickfix.Message
+import quickfix.field.LegProduct
+import quickfix.field.LegSymbol
 import quickfix.field.MaturityMonthYear
 import quickfix.field.MsgType
+import quickfix.field.NoLegs
 import quickfix.field.NoRelatedSym
 import quickfix.field.OrderQty
 import quickfix.field.QuoteReqID
@@ -117,6 +120,21 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
         assertEquals("2022-07-03T17:11:03", msg.getUtcTimeStamp(TransactTime.FIELD).toString())
 
         assertEquals(obj.noRelatedSym.size, msg.getInt(NoRelatedSym.FIELD))
+
+        val noRelatedSymGroups = msg.getGroups(NoRelatedSym.FIELD)
+        obj.noRelatedSym.zip(noRelatedSymGroups).forEach { (noRelatedSym, group) ->
+            assertEquals(noRelatedSym.quoteType, group.getInt(QuoteType.FIELD))
+            assertEquals(noRelatedSym.noLegs.size, group.getInt(NoLegs.FIELD))
+
+            val noLegsGroups = group.getGroups(NoLegs.FIELD)
+            assertEquals(noRelatedSym.noLegs.size, noLegsGroups.size)
+
+            noRelatedSym.noLegs.zip(noLegsGroups).forEach { (noLegs, group) ->
+                assertEquals(noLegs.legSymbol, group.getString(LegSymbol.FIELD))
+                assertEquals(noLegs.legProduct, group.getInt(LegProduct.FIELD))
+            }
+        }
+
     }
 
     @Test
