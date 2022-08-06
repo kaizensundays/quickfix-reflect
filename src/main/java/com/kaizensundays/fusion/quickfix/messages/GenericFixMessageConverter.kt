@@ -25,6 +25,8 @@ typealias GroupBeanFactory = () -> Any
 
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
+    private val fo = FromObject(dictionary)
+
     private val msgTypeToJavaTypeMap: Map<*, () -> FixMessage> = mapOf(
         MsgType.ORDER_SINGLE to { NewOrderSingle() },
         MsgType.QUOTE_REQUEST to { QuoteRequest() }
@@ -209,6 +211,8 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 
     override fun fromObject(obj: FixMessage): Message {
 
+        return fo.fromObject(obj)
+/*
         val msg = Message()
 
         msg.header.setFields(FixMessage::class.java, obj)
@@ -216,6 +220,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         msg.setFields(obj.javaClass, obj)
 
         return msg
+*/
     }
 
     fun Field.getGroups(obj: Any): MutableList<Any> {

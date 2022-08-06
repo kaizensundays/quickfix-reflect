@@ -137,6 +137,7 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
 
     }
 
+/*
     @Test
     fun walkNewOrderSingle() {
 
@@ -160,5 +161,6 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
 
         assertEquals("[msgType, beginString, senderCompID, targetCompID, quoteReqID, symbol, transactTime, quoteType, legSymbol, legProduct, legSymbol, legProduct]", names.toString())
     }
+*/
 
 }

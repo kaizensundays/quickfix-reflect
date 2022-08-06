@@ -99,12 +99,16 @@ class FromObject(private val dictionary: FixDictionary) {
             }
         }
     }
+/*
 
     private fun walkObj(type: Class<*>, obj: Any, action: (field: Field) -> Unit) {
 
         val fields = type.declaredFields
 
         fields.forEach { f ->
+            action.invoke(f)
+*/
+/*
             if (!f.isList()) {
                 action.invoke(f)
             } else {
@@ -113,6 +117,8 @@ class FromObject(private val dictionary: FixDictionary) {
                     walkObj(e.javaClass, e, action)
                 }
             }
+*//*
+
         }
 
     }
@@ -124,9 +130,18 @@ class FromObject(private val dictionary: FixDictionary) {
         walkObj(obj.javaClass, obj, fieldAction)
 
     }
+*/
 
     fun fromObject(obj: FixMessage): Message {
         val msg = Message()
+
+        FixMessage::class.java.declaredFields.forEach { field ->
+            fieldCopyTo(field, obj, msg.header)
+        }
+
+        obj.javaClass.declaredFields.forEach { field ->
+            fieldCopyTo(field, obj, msg)
+        }
 
         return msg
     }
