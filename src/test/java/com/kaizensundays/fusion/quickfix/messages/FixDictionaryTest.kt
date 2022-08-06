@@ -1,9 +1,11 @@
 package com.kaizensundays.fusion.quickfix.messages
 
+import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import org.junit.Before
 import org.junit.Test
 import quickfix.Message
 import quickfix.field.MsgType
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
 /**
@@ -44,6 +46,27 @@ class FixDictionaryTest {
         assertEquals(sortedSetOf(78, 386, 711), dictionary.getGroupTags(message(MsgType.ORDER_SINGLE)).toSortedSet())
         assertEquals(sortedSetOf(78, 386, 555, 711), dictionary.getGroupTags(message(MsgType.NEW_ORDER_MULTILEG)).toSortedSet())
         assertEquals(sortedSetOf(146), dictionary.getGroupTags(message(MsgType.QUOTE_REQUEST)).toSortedSet())
+    }
+
+    @Test
+    fun javaType() {
+
+        // ToDo: create map<field.name, setter>, check if field type is correct
+        // TransactTime -> LocalDateTime -> Long
+        // convertLocalDateTimeToLong(ldt: LocalDateTime)
+
+        NewOrderSingle::class.java.declaredFields.forEach { field ->
+            println(field.name)
+            val className = "quickfix.field." + field.name.firstCharToUpper()
+            println("className=$className")
+            val type = Class.forName(className)
+
+            val paramClass = type.constructors.filter { c -> c.parameterCount == 1 }
+                .first().parameterTypes.first()
+
+            println("paramClass=$paramClass")
+        }
+
     }
 
 }
