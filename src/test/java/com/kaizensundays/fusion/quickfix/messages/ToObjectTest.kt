@@ -1,11 +1,16 @@
 package com.kaizensundays.fusion.quickfix.messages
 
+import com.kaizensundays.fusion.quickfix.setTransactTimeTag
+import org.junit.Before
 import org.junit.Test
 import quickfix.field.BeginString
+import quickfix.field.MaturityMonthYear
 import quickfix.field.MsgType
+import quickfix.field.OrderQty
 import quickfix.field.QuoteType
 import quickfix.field.SenderCompID
 import quickfix.field.Side
+import quickfix.field.Symbol
 import quickfix.field.TargetCompID
 import kotlin.test.assertEquals
 
@@ -62,6 +67,12 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
         ),
     )
 
+    @Before
+    override fun before() {
+        super.before()
+        converter.registerSetTagByFieldName("TransactTime", setTransactTimeTag)
+    }
+
     private fun setObjectFields(objs: Array<NewOrderSingle>) {
 
         objs.forEachIndexed { i, _ ->
@@ -71,16 +82,19 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
             val obj = NewOrderSingle()
 
             to.set(msg.header, FixMessage::class.java, obj)
-
-/*
             to.set(msg, NewOrderSingle::class.java, obj)
-*/
 
             with(msg) {
                 assertEquals(header.getString(BeginString.FIELD), obj.beginString)
                 assertEquals(header.getString(MsgType.FIELD), obj.msgType)
                 assertEquals(header.getString(SenderCompID.FIELD), obj.senderCompID)
                 assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
+
+                assertEquals(getChar(Side.FIELD), obj.side)
+                assertEquals(getDouble(OrderQty.FIELD), obj.orderQty)
+                assertEquals(getString(Symbol.FIELD), obj.symbol)
+                assertEquals(getInt(MaturityMonthYear.FIELD), obj.maturityMonthYear)
+                assertEquals(1656868263000, obj.transactTime)
             }
         }
 
@@ -94,15 +108,18 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
 
             val obj = QuoteRequest()
 
-            FixMessage::class.java.declaredFields.forEach { f ->
-                to.set(msg.header, FixMessage::class.java, obj)
-            }
+            to.set(msg.header, FixMessage::class.java, obj)
+
+            to.set(msg, QuoteRequest::class.java, obj)
 
             with(msg) {
                 assertEquals(header.getString(BeginString.FIELD), obj.beginString)
                 assertEquals(header.getString(MsgType.FIELD), obj.msgType)
                 assertEquals(header.getString(SenderCompID.FIELD), obj.senderCompID)
                 assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
+
+                assertEquals(getString(Symbol.FIELD), obj.symbol)
+                assertEquals(1656868263000, obj.transactTime)
             }
         }
     }
