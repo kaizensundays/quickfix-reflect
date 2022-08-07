@@ -20,15 +20,15 @@ class FromObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private val setCharTag: SetTag = { tag, field, obj ->
+    private val setCharTag: SetTag = { tag, field, obj, _ ->
         obj.getValue(field) { value -> this.setChar(tag, value as Char) }
     }
 
-    private val setStringTag: SetTag = { tag, field, obj ->
+    private val setStringTag: SetTag = { tag, field, obj, _ ->
         obj.getValue(field) { value -> this.setString(tag, value as String) }
     }
 
-    private val setIntTag: SetTag = { tag, field, obj ->
+    private val setIntTag: SetTag = { tag, field, obj, _ ->
         obj.getValue(field) { value -> this.setInt(tag, value as Int) }
     }
 
@@ -37,13 +37,15 @@ class FromObject(private val dictionary: FixDictionary) {
         return if (field != null) field.type else "?"
     }
 
-    val setLongTag: SetTag = { tag, field, obj ->
+    val setLongTag: SetTag = { tag, field, obj, _ ->
         obj.getValue(field) { value ->
             when (fixType(tag)) {
+/*
                 "UTCTIMESTAMP" -> {
                     val timestamp = value as Long
                     this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
                 }
+*/
                 "MONTHYEAR" -> {
                     this.setInt(tag, (value as Long).toInt())
                 }
@@ -54,11 +56,11 @@ class FromObject(private val dictionary: FixDictionary) {
         }
     }
 
-    val setDoubleTag: SetTag = { tag, field, obj ->
+    val setDoubleTag: SetTag = { tag, field, obj, _ ->
         obj.getValue(field) { value -> this.setDouble(tag, value as Double) }
     }
 
-    private val setTransactTimeTag: SetTag = { tag, field, obj ->
+    private val setTransactTimeTag: SetTag = { tag, field, obj, _ ->
         obj.getValue(field) { value ->
             val type = fixType(tag)
             if ("UTCTIMESTAMP" != type) {
@@ -69,9 +71,13 @@ class FromObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private val setTagByFieldNameMap: Map<String, SetTag> = mapOf(
+    private val setTagByFieldNameMap: MutableMap<String, SetTag> = mutableMapOf(
         "TransactTime" to setTransactTimeTag
     )
+
+    fun registerSetTagByFieldName(name: String, setTag: SetTag) {
+        setTagByFieldNameMap[name] = setTag
+    }
 
     private val setTagMap: Map<Class<*>, SetTag> = mapOf(
         Character::class.java to setCharTag,
@@ -107,11 +113,11 @@ class FromObject(private val dictionary: FixDictionary) {
             if (tag != null && !field.isList()) {
                 var setTag = setTagByFieldNameMap[field.name.firstCharToUpper()]
                 if (setTag != null) {
-                    target.setTag(tag, field, obj)
+                    target.setTag(tag, field, obj, dictionary)
                 } else {
                     setTag = setTagMap[field.type]
                     if (setTag != null) {
-                        target.setTag(tag, field, obj)
+                        target.setTag(tag, field, obj, dictionary)
                     }
                 }
             } else if (field.isList()) {
