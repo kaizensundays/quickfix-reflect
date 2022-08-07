@@ -8,7 +8,6 @@ import quickfix.field.SenderCompID
 import quickfix.field.Side
 import quickfix.field.TargetCompID
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 /**
  * Created: Saturday 7/30/2022, 12:58 PM Eastern Time
@@ -63,22 +62,33 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
         ),
     )
 
+    private fun setObjectFields(objs: Array<NewOrderSingle>) {
+
+        objs.forEachIndexed { i, _ ->
+
+            val msg = converter.fromObject(objs[i])
+
+            val obj = NewOrderSingle()
+
+            FixMessage::class.java.declaredFields.forEach { f ->
+                to.set(msg.header, FixMessage::class.java, obj)
+            }
+
+            with(msg) {
+                assertEquals(header.getString(BeginString.FIELD), obj.beginString)
+                assertEquals(header.getString(MsgType.FIELD), obj.msgType)
+                assertEquals(header.getString(SenderCompID.FIELD), obj.senderCompID)
+                assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
+            }
+        }
+
+    }
+
 
     @Test
-    fun fieldCopyToNewOrderSingle() {
+    fun setObjectFields() {
 
-        val msg = converter.fromObject(newOrderSingles[0])
-
-        val obj = to.toObject(msg)
-
-        assertTrue(obj is NewOrderSingle)
-
-        with(msg) {
-            assertEquals(header.getString(BeginString.FIELD), obj.beginString)
-            assertEquals(header.getString(MsgType.FIELD), obj.msgType)
-            assertEquals(header.getString(SenderCompID.FIELD), obj.senderCompID)
-            assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
-        }
+        setObjectFields(newOrderSingles)
 
     }
 
