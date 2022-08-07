@@ -138,6 +138,18 @@ class ToObject(private val dictionary: FixDictionary) {
         }
     }
 
+    private fun setField(source: FieldMap, tag: Int, field: Field, target: Any) {
+        var setField = setFieldByFieldNameMap[field.name.firstCharToUpper()]
+        if (setField != null) {
+            target.setField(field, tag, source, dictionary)
+        } else {
+            setField = setFieldMap[field.type]
+            if (setField != null) {
+                target.setField(field, tag, source, dictionary)
+            }
+        }
+    }
+
     private fun set(source: FieldMap, field: Field, target: Any) {
 
         val tag = tag(field.name)
@@ -145,15 +157,7 @@ class ToObject(private val dictionary: FixDictionary) {
             if (field.isList()) {
                 setGroups(source, tag, field, target)
             } else {
-                var setField = setFieldByFieldNameMap[field.name.firstCharToUpper()]
-                if (setField != null) {
-                    target.setField(field, tag, source, dictionary)
-                } else {
-                    setField = setFieldMap[field.type]
-                    if (setField != null) {
-                        target.setField(field, tag, source, dictionary)
-                    }
-                }
+                setField(source, tag, field, target)
             }
         }
 
