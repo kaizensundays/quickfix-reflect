@@ -134,13 +134,15 @@ class ToObject(private val dictionary: FixDictionary) {
     private fun set(source: FieldMap, field: Field, target: Any) {
 
         val tag = tag(field.name)
-        if (tag != null && !field.isList()) {
-            val setField = setFieldMap[field.type]
-            if (setField != null) {
-                target.setField(field, tag, source)
+        if (tag != null) {
+            if (field.isList()) {
+                setGroups(source, tag, field, target)
+            } else {
+                val setField = setFieldMap[field.type]
+                if (setField != null) {
+                    target.setField(field, tag, source)
+                }
             }
-        } else if (tag != null && field.isList()) {
-            setGroups(source, tag, field, target)
         }
 
     }
