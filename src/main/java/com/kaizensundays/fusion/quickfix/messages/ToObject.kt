@@ -93,25 +93,18 @@ class ToObject(private val dictionary: FixDictionary) {
         java.lang.Double::class.java to setDoubleField,
     )
 
-    fun set(source: FieldMap, type: Class<*>, target: Any) {
-
-        val fieldMap = type.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
-
-        val names = fieldMap.map { entry -> entry.key }
-
-        names.forEach { name ->
-            val field = fieldMap[name]
-            if (field != null) {
-                val tag = tag(field.name)
-                if (tag != null && !field.isList()) {
-                    val setField = setFieldMap[field.type]
-                    if (setField != null) {
-                        target.setField(field, tag, source)
-                    }
-                }
+    fun set(source: FieldMap, field: Field, target: Any) {
+        val tag = tag(field.name)
+        if (tag != null && !field.isList()) {
+            val setField = setFieldMap[field.type]
+            if (setField != null) {
+                target.setField(field, tag, source)
             }
         }
+    }
 
+    fun set(source: FieldMap, type: Class<*>, target: Any) {
+        type.declaredFields.forEach { field -> set(source, field, target) }
     }
 
     fun toObject(msg: Message): FixMessage {
