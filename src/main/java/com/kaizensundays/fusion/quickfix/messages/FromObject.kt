@@ -1,5 +1,6 @@
 package com.kaizensundays.fusion.quickfix.messages
 
+import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import quickfix.Message
@@ -57,7 +58,22 @@ class FromObject(private val dictionary: FixDictionary) {
         obj.getValue(field) { value -> this.setDouble(tag, value as Double) }
     }
 
-    private val setTagMap: Map<Class<*>, FieldMap.(tag: Int, field: Field, obj: Any) -> Unit> = mapOf(
+    private val setTransactTimeTag: SetTag = { tag, field, obj ->
+        obj.getValue(field) { value ->
+            val type = fixType(tag)
+            if ("UTCTIMESTAMP" != type) {
+                throw IllegalArgumentException()
+            }
+            val timestamp = value as Long
+            this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
+        }
+    }
+
+    private val setTagByFieldNameMap: Map<String, SetTag> = mapOf(
+        "TransactTime" to setTransactTimeTag
+    )
+
+    private val setTagMap: Map<Class<*>, SetTag> = mapOf(
         Character::class.java to setCharTag,
         String::class.java to setStringTag,
         Integer::class.java to setIntTag,
@@ -89,9 +105,14 @@ class FromObject(private val dictionary: FixDictionary) {
         if (value != null) {
             val tag = dictionary.tag(field.name)
             if (tag != null && !field.isList()) {
-                val setTag = setTagMap[field.type]
+                var setTag = setTagByFieldNameMap[field.name.firstCharToUpper()]
                 if (setTag != null) {
                     target.setTag(tag, field, obj)
+                } else {
+                    setTag = setTagMap[field.type]
+                    if (setTag != null) {
+                        target.setTag(tag, field, obj)
+                    }
                 }
             } else if (field.isList()) {
                 listCopyTo(field, obj, target)
