@@ -70,16 +70,24 @@ class ToObject(private val dictionary: FixDictionary) {
     private val setLongField: SetField = { field, tag, msg ->
         if (msg.isSetField(tag) && !field.isFinal()) {
             when (fixType(tag)) {
+/*
                 "UTCTIMESTAMP" -> {
                     val value = toEpochMilli(msg.getUtcTimeStamp(tag))
                     field.set(this, value)
                 }
+*/
                 "MONTHYEAR" -> {
                     val value = msg.getInt(tag).toLong()
                     field.set(this, value)
                 }
             }
         }
+    }
+
+    private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
+
+    fun register(name: String, setter: SetField) {
+        setFieldByFieldNameMap[name] = setter
     }
 
     private val setDoubleField: SetField = { field, tag, msg ->
@@ -138,9 +146,14 @@ class ToObject(private val dictionary: FixDictionary) {
             if (field.isList()) {
                 setGroups(source, tag, field, target)
             } else {
-                val setField = setFieldMap[field.type]
+                var setField = setFieldByFieldNameMap[field.name.firstCharToUpper()]
                 if (setField != null) {
                     target.setField(field, tag, source)
+                } else {
+                    setField = setFieldMap[field.type]
+                    if (setField != null) {
+                        target.setField(field, tag, source)
+                    }
                 }
             }
         }
