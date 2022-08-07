@@ -1,7 +1,6 @@
 package com.kaizensundays.fusion.quickfix.messages
 
 import com.kaizensundays.fusion.quickfix.firstCharToUpper
-import com.kaizensundays.fusion.quickfix.toEpochMilli
 import quickfix.FieldMap
 import quickfix.Message
 import quickfix.field.MsgType
@@ -40,7 +39,7 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
-    private val setCharField: SetField = { field, tag, msg ->
+    private val setCharField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag)) {
             val value = msg.getChar(tag)
             if (!field.isFinal()) {
@@ -49,7 +48,7 @@ class ToObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private val setStringField: SetField = { field, tag, msg ->
+    private val setStringField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag)) {
             val value = msg.getString(tag)
             if (!field.isFinal()) {
@@ -58,7 +57,7 @@ class ToObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private val setIntField: SetField = { field, tag, msg ->
+    private val setIntField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag)) {
             val value = msg.getInt(tag)
             if (!field.isFinal()) {
@@ -67,7 +66,7 @@ class ToObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private val setLongField: SetField = { field, tag, msg ->
+    private val setLongField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag) && !field.isFinal()) {
             when (fixType(tag)) {
 /*
@@ -90,7 +89,7 @@ class ToObject(private val dictionary: FixDictionary) {
         setFieldByFieldNameMap[name] = setter
     }
 
-    private val setDoubleField: SetField = { field, tag, msg ->
+    private val setDoubleField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag)) {
             val value = msg.getDouble(tag)
             if (!field.isFinal()) {
@@ -148,11 +147,11 @@ class ToObject(private val dictionary: FixDictionary) {
             } else {
                 var setField = setFieldByFieldNameMap[field.name.firstCharToUpper()]
                 if (setField != null) {
-                    target.setField(field, tag, source)
+                    target.setField(field, tag, source, dictionary)
                 } else {
                     setField = setFieldMap[field.type]
                     if (setField != null) {
-                        target.setField(field, tag, source)
+                        target.setField(field, tag, source, dictionary)
                     }
                 }
             }

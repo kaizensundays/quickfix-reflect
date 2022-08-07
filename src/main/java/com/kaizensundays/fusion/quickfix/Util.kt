@@ -48,7 +48,7 @@ val setTransactTimeTag: SetTag = { tag, field, obj, dictionary ->
 
 fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
-val setTransactTimeField: SetField = { field, tag, msg ->
+val setTransactTimeField: SetField = { field, tag, msg, dictionary ->
     if (msg.isSetField(tag) && !field.isFinal()) {
         val value = toEpochMilli(msg.getUtcTimeStamp(tag))
         field.set(this, value)

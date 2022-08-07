@@ -18,7 +18,7 @@ import java.lang.reflect.Modifier
  * @author Sergey Chuykov
  */
 typealias SetTag = FieldMap.(Int, Field, Any, FixDictionary) -> Unit
-typealias SetField = Any.(Field, Int, FieldMap) -> Unit
+typealias SetField = Any.(Field, Int, FieldMap, FixDictionary) -> Unit
 
 typealias GroupFactory = () -> Group
 typealias GroupBeanFactory = () -> Any
@@ -90,7 +90,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         obj.getValue(field) { value -> this.setDouble(tag, value as Double) }
     }
 
-    val setCharField: SetField = { field, tag, msg ->
+    val setCharField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag)) {
             val value = msg.getChar(tag)
             if (!field.isFinal()) {
@@ -99,7 +99,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val setStringField: SetField = { field, tag, msg ->
+    val setStringField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag)) {
             val value = msg.getString(tag)
             if (!field.isFinal()) {
@@ -108,7 +108,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val setIntField: SetField = { field, tag, msg ->
+    val setIntField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag)) {
             val value = msg.getInt(tag)
             if (!field.isFinal()) {
@@ -117,7 +117,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val setLongField: SetField = { field, tag, msg ->
+    val setLongField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag) && !field.isFinal()) {
             when (fixType(tag)) {
                 "UTCTIMESTAMP" -> {
@@ -132,7 +132,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
     }
 
-    val setDoubleField: SetField = { field, tag, msg ->
+    val setDoubleField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag)) {
             val value = msg.getDouble(tag)
             if (!field.isFinal()) {
@@ -257,7 +257,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
                 if (tag != null && !field.isList()) {
                     val setField = setFieldMap[field.type]
                     if (setField != null) {
-                        obj.setField(field, tag, this)
+                        obj.setField(field, tag, this, dictionary)
                     }
                 } else if (tag != null && field.isList()) {
                     if (isSetField(tag)) {
