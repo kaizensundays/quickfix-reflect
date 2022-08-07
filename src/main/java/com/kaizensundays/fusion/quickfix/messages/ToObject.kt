@@ -7,7 +7,7 @@ import quickfix.Message
  *
  * @author Sergey Chuykov
  */
-class ToObject {
+class ToObject(private val dictionary: FixDictionary) {
 
     fun toObject(msg: Message): FixMessage {
         return QuoteRequest()

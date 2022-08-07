@@ -26,16 +26,11 @@ class FromObject(private val dictionary: FixDictionary) {
         obj.getValue(field) { value -> this.setInt(tag, value as Int) }
     }
 
-    fun fixType(tag: Int): String {
-        val field = dictionary.tagToFieldMap()[tag]
-        return if (field != null) field.type else "?"
-    }
-
-    val setLongTag: SetTag = { tag, field, obj, _ ->
+    private val setLongTag: SetTag = { tag, field, obj, _ ->
         obj.getValue(field) { value -> this.setDecimal(tag, BigDecimal.valueOf(value as Long)) }
     }
 
-    val setDoubleTag: SetTag = { tag, field, obj, _ ->
+    private val setDoubleTag: SetTag = { tag, field, obj, _ ->
         obj.getValue(field) { value -> this.setDouble(tag, value as Double) }
     }
 
