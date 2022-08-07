@@ -34,21 +34,27 @@ inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
 }
 
 val setTransactTimeTag: SetTag = { tag, field, obj, dictionary ->
+
+    val fixField = dictionary.tagToFieldMap()[tag]
+    if ("UTCTIMESTAMP" != fixField?.type) {
+        throw IllegalArgumentException()
+    }
+
     obj.getValue(field) { value ->
-        val fixField = dictionary.tagToFieldMap()[tag]
-        if (fixField != null) {
-            if ("UTCTIMESTAMP" != fixField.type) {
-                throw IllegalArgumentException()
-            }
-            val timestamp = value as Long
-            this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
-        }
+        val timestamp = value as Long
+        this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
     }
 }
 
 fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
 val setTransactTimeField: SetField = { field, tag, msg, dictionary ->
+
+    val fixField = dictionary.tagToFieldMap()[tag]
+    if ("UTCTIMESTAMP" != fixField?.type) {
+        throw IllegalArgumentException()
+    }
+
     if (msg.isSetField(tag) && !field.isFinal()) {
         val value = toEpochMilli(msg.getUtcTimeStamp(tag))
         field.set(this, value)
