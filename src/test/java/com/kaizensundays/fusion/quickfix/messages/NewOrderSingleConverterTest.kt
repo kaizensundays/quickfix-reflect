@@ -75,7 +75,7 @@ class NewOrderSingleConverterTest : GenericFixMessageConverterTestSupport() {
                 assertEquals(getDouble(OrderQty.FIELD), obj.orderQty)
                 assertEquals(getString(Symbol.FIELD), obj.symbol)
 
-                assertEquals(getInt(MaturityMonthYear.FIELD).toLong(), obj.maturityMonthYear)
+                assertEquals(getInt(MaturityMonthYear.FIELD), obj.maturityMonthYear)
                 assertEquals(1656868263000, obj.transactTime)
             }
         }

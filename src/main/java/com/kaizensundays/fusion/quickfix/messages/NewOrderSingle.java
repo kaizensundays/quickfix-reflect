@@ -12,7 +12,7 @@ public class NewOrderSingle extends FixMessage {
     public Character side;
     public Double orderQty;
     public String symbol;
-    public Long maturityMonthYear;
+    public Integer maturityMonthYear;
     public Long transactTime;
 
     public NewOrderSingle() {

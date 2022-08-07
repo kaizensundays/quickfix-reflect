@@ -5,6 +5,7 @@ import com.kaizensundays.fusion.quickfix.getValue
 import quickfix.FieldMap
 import quickfix.Message
 import java.lang.reflect.Field
+import java.math.BigDecimal
 
 /**
  * Created: Saturday 7/30/2022, 12:55 PM Eastern Time
@@ -31,16 +32,7 @@ class FromObject(private val dictionary: FixDictionary) {
     }
 
     val setLongTag: SetTag = { tag, field, obj, _ ->
-        obj.getValue(field) { value ->
-            when (fixType(tag)) {
-                "MONTHYEAR" -> {
-                    this.setInt(tag, (value as Long).toInt())
-                }
-                "INT" -> {
-                    this.setInt(tag, (value as Long).toInt())
-                }
-            }
-        }
+        obj.getValue(field) { value -> this.setDecimal(tag, BigDecimal.valueOf(value as Long)) }
     }
 
     val setDoubleTag: SetTag = { tag, field, obj, _ ->
