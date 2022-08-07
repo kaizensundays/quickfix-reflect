@@ -6,6 +6,7 @@ import org.junit.Test
 import quickfix.field.BeginString
 import quickfix.field.MaturityMonthYear
 import quickfix.field.MsgType
+import quickfix.field.NoRelatedSym
 import quickfix.field.OrderQty
 import quickfix.field.QuoteType
 import quickfix.field.SenderCompID
@@ -120,6 +121,11 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
 
                 assertEquals(getString(Symbol.FIELD), obj.symbol)
                 assertEquals(1656868263000, obj.transactTime)
+
+                assertEquals(getInt(NoRelatedSym.FIELD), obj.noRelatedSym.size)
+
+                val noRelatedSymGroups = msg.getGroups(NoRelatedSym.FIELD)
+                assertEquals(noRelatedSymGroups.size, obj.noRelatedSym.size)
             }
         }
     }

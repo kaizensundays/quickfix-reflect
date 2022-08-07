@@ -5,6 +5,8 @@ import com.kaizensundays.fusion.quickfix.toEpochMilli
 import quickfix.FieldMap
 import quickfix.Message
 import quickfix.field.MsgType
+import quickfix.field.NoLegs
+import quickfix.field.NoRelatedSym
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
@@ -18,6 +20,10 @@ class ToObject(private val dictionary: FixDictionary) {
     private val msgTypeToJavaTypeMap: Map<*, () -> FixMessage> = mapOf(
         MsgType.ORDER_SINGLE to { NewOrderSingle() },
         MsgType.QUOTE_REQUEST to { QuoteRequest() }
+    )
+    private val tagToGroupBeanMap: Map<*, GroupBeanFactory> = mapOf(
+        NoRelatedSym.FIELD to { QuoteRequest.NoRelatedSym() },
+        NoLegs.FIELD to { QuoteRequest.NoRelatedSym.NoLegs() },
     )
 
     private fun tag(fieldName: String): Int? {
@@ -93,14 +99,46 @@ class ToObject(private val dictionary: FixDictionary) {
         java.lang.Double::class.java to setDoubleField,
     )
 
-    fun set(source: FieldMap, field: Field, target: Any) {
+    private fun Field.getGroups(obj: Any): MutableList<Any> {
+        var list = this.get(obj)
+        if (list == null) {
+            if (this.isFinal()) {
+                throw java.lang.IllegalStateException("Field " + this.name + " must not be final")
+            }
+            list = mutableListOf<Any>()
+            this.set(obj, list)
+        } else {
+            if (list !is MutableList<*>) {
+                throw java.lang.IllegalStateException("Field " + this.name + " must be MutableList")
+            }
+        }
+        @Suppress("UNCHECKED_CAST")
+        return list as MutableList<Any>
+    }
+
+    private fun set(source: FieldMap, field: Field, target: Any) {
+
         val tag = tag(field.name)
         if (tag != null && !field.isList()) {
             val setField = setFieldMap[field.type]
             if (setField != null) {
                 target.setField(field, tag, source)
             }
+        } else if (tag != null && field.isList()) {
+            if (source.isSetField(tag)) {
+                val groups = source.getGroups(tag)
+                groups.forEach { group ->
+                    val factory = tagToGroupBeanMap[tag]
+                    if (factory != null) {
+                        val groupBean = factory.invoke()
+                        set(group, groupBean.javaClass, groupBean)
+                        val list = field.getGroups(target)
+                        list.add(groupBean)
+                    }
+                }
+            }
         }
+
     }
 
     fun set(source: FieldMap, type: Class<*>, target: Any) {
