@@ -70,9 +70,11 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
 
             val obj = NewOrderSingle()
 
-            FixMessage::class.java.declaredFields.forEach { f ->
-                to.set(msg.header, FixMessage::class.java, obj)
-            }
+            to.set(msg.header, FixMessage::class.java, obj)
+
+/*
+            to.set(msg, NewOrderSingle::class.java, obj)
+*/
 
             with(msg) {
                 assertEquals(header.getString(BeginString.FIELD), obj.beginString)
