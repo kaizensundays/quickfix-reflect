@@ -1,5 +1,7 @@
 package com.kaizensundays.fusion.quickfix
 
+import com.kaizensundays.fusion.quickfix.messages.SetTag
+import java.lang.reflect.Field
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -21,3 +23,24 @@ fun toLocalDateTime(timestamp: Long): LocalDateTime {
 fun toEpochMilli(ldt: LocalDateTime): Long {
     return ldt.toInstant(ZoneOffset.UTC).toEpochMilli()
 }
+
+inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
+    val value = field.get(this)
+    if (value != null) {
+        set(value)
+    }
+}
+
+val setTransactTimeTag: SetTag = { tag, field, obj, dictionary ->
+    obj.getValue(field) { value ->
+        val fixField = dictionary.tagToFieldMap()[tag]
+        if (fixField != null) {
+            if ("UTCTIMESTAMP" != fixField.type) {
+                throw IllegalArgumentException()
+            }
+            val timestamp = value as Long
+            this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
+        }
+    }
+}
+

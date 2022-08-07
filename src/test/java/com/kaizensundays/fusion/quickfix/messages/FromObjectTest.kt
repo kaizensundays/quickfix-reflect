@@ -1,5 +1,7 @@
 package com.kaizensundays.fusion.quickfix.messages
 
+import com.kaizensundays.fusion.quickfix.setTransactTimeTag
+import org.junit.Before
 import org.junit.Test
 import quickfix.Message
 import quickfix.field.LegProduct
@@ -70,6 +72,12 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
             )
         ),
     )
+
+    @Before
+    override fun before() {
+        super.before()
+        fo.registerSetTagByFieldName("TransactTime", setTransactTimeTag)
+    }
 
     @Test
     fun fieldCopyToNewOrderSingle() {

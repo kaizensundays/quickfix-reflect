@@ -20,7 +20,7 @@ abstract class GenericFixMessageConverterTestSupport {
     val converter = GenericFixMessageConverter(dictionary)
 
     @Before
-    fun before() {
+    open fun before() {
         dictionary.init()
     }
 

@@ -1,5 +1,7 @@
 package com.kaizensundays.fusion.quickfix.messages
 
+import com.kaizensundays.fusion.quickfix.setTransactTimeTag
+import org.junit.Before
 import org.junit.Test
 import quickfix.field.BeginString
 import quickfix.field.LegProduct
@@ -59,6 +61,12 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
             )
         ),
     )
+
+    @Before
+    override fun before() {
+        super.before()
+        converter.registerSetTagByFieldName("TransactTime", setTransactTimeTag)
+    }
 
     @Test
     fun hasComponent() {
