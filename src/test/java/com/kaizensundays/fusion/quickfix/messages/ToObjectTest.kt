@@ -1,8 +1,14 @@
 package com.kaizensundays.fusion.quickfix.messages
 
 import org.junit.Test
+import quickfix.field.BeginString
+import quickfix.field.MsgType
 import quickfix.field.QuoteType
+import quickfix.field.SenderCompID
 import quickfix.field.Side
+import quickfix.field.TargetCompID
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Created: Saturday 7/30/2022, 12:58 PM Eastern Time
@@ -59,7 +65,21 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
 
 
     @Test
-    fun test() {
+    fun fieldCopyToNewOrderSingle() {
+
+        val msg = converter.fromObject(newOrderSingles[0])
+
+        val obj = to.toObject(msg)
+
+        assertTrue(obj is NewOrderSingle)
+
+        with(msg) {
+            assertEquals(header.getString(BeginString.FIELD), obj.beginString)
+            assertEquals(header.getString(MsgType.FIELD), obj.msgType)
+            assertEquals(header.getString(SenderCompID.FIELD), obj.senderCompID)
+            assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
+        }
+
     }
 
 }
