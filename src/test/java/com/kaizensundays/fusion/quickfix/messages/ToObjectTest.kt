@@ -84,12 +84,32 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
 
     }
 
+    private fun setObjectFields(objs: Array<QuoteRequest>) {
+
+        objs.forEachIndexed { i, _ ->
+
+            val msg = converter.fromObject(objs[i])
+
+            val obj = QuoteRequest()
+
+            FixMessage::class.java.declaredFields.forEach { f ->
+                to.set(msg.header, FixMessage::class.java, obj)
+            }
+
+            with(msg) {
+                assertEquals(header.getString(BeginString.FIELD), obj.beginString)
+                assertEquals(header.getString(MsgType.FIELD), obj.msgType)
+                assertEquals(header.getString(SenderCompID.FIELD), obj.senderCompID)
+                assertEquals(header.getString(TargetCompID.FIELD), obj.targetCompID)
+            }
+        }
+    }
+
 
     @Test
     fun setObjectFields() {
-
         setObjectFields(newOrderSingles)
-
+        setObjectFields(quoteRequests)
     }
 
 }
