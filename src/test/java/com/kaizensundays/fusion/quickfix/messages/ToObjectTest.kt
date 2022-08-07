@@ -4,8 +4,11 @@ import com.kaizensundays.fusion.quickfix.setTransactTimeTag
 import org.junit.Before
 import org.junit.Test
 import quickfix.field.BeginString
+import quickfix.field.LegProduct
+import quickfix.field.LegSymbol
 import quickfix.field.MaturityMonthYear
 import quickfix.field.MsgType
+import quickfix.field.NoLegs
 import quickfix.field.NoRelatedSym
 import quickfix.field.OrderQty
 import quickfix.field.QuoteType
@@ -126,6 +129,19 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
 
                 val noRelatedSymGroups = msg.getGroups(NoRelatedSym.FIELD)
                 assertEquals(noRelatedSymGroups.size, obj.noRelatedSym.size)
+
+                noRelatedSymGroups.zip(obj.noRelatedSym).forEach { (group, noRelatedSym) ->
+                    assertEquals(group.getInt(QuoteType.FIELD), noRelatedSym.quoteType)
+                    assertEquals(group.getInt(NoLegs.FIELD), noRelatedSym.noLegs.size)
+
+                    val noLegsGroup = group.getGroups(NoLegs.FIELD)
+                    assertEquals(noLegsGroup.size, noRelatedSym.noLegs.size)
+
+                    noLegsGroup.zip(noRelatedSym.noLegs).forEach { (group, noLegs) ->
+                        assertEquals(group.getString(LegSymbol.FIELD), noLegs.legSymbol)
+                        assertEquals(group.getInt(LegProduct.FIELD), noLegs.legProduct)
+                    }
+                }
             }
         }
     }
