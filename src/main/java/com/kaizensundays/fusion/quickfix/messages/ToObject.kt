@@ -116,6 +116,21 @@ class ToObject(private val dictionary: FixDictionary) {
         return list as MutableList<Any>
     }
 
+    private fun setGroups(source: FieldMap, tag: Int, field: Field, target: Any) {
+        if (source.isSetField(tag)) {
+            val groups = source.getGroups(tag)
+            groups.forEach { group ->
+                val factory = tagToGroupBeanMap[tag]
+                if (factory != null) {
+                    val groupBean = factory.invoke()
+                    set(group, groupBean.javaClass, groupBean)
+                    val list = field.getGroups(target)
+                    list.add(groupBean)
+                }
+            }
+        }
+    }
+
     private fun set(source: FieldMap, field: Field, target: Any) {
 
         val tag = tag(field.name)
@@ -125,18 +140,7 @@ class ToObject(private val dictionary: FixDictionary) {
                 target.setField(field, tag, source)
             }
         } else if (tag != null && field.isList()) {
-            if (source.isSetField(tag)) {
-                val groups = source.getGroups(tag)
-                groups.forEach { group ->
-                    val factory = tagToGroupBeanMap[tag]
-                    if (factory != null) {
-                        val groupBean = factory.invoke()
-                        set(group, groupBean.javaClass, groupBean)
-                        val list = field.getGroups(target)
-                        list.add(groupBean)
-                    }
-                }
-            }
+            setGroups(source, tag, field, target)
         }
 
     }
