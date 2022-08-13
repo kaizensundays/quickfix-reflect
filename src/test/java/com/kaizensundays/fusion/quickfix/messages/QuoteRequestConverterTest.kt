@@ -64,6 +64,7 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
     @Before
     override fun before() {
         super.before()
+        converter.register { QuoteRequest() }
         converter.register(TransactTimeConverter(dictionary))
     }
 

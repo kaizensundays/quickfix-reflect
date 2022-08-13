@@ -16,10 +16,8 @@ import java.lang.reflect.Modifier
  */
 class ToObject(private val dictionary: FixDictionary) {
 
-    private val msgTypeToJavaTypeMap: Map<*, () -> FixMessage> = mapOf(
-        MsgType.ORDER_SINGLE to { NewOrderSingle() },
-        MsgType.QUOTE_REQUEST to { QuoteRequest() }
-    )
+    private val msgTypeToJavaTypeMap: MutableMap<String, () -> FixMessage> = mutableMapOf()
+
     private val tagToGroupBeanMap: Map<*, GroupBeanFactory> = mapOf(
         NoRelatedSym.FIELD to { QuoteRequest.NoRelatedSym() },
         NoLegs.FIELD to { QuoteRequest.NoRelatedSym.NoLegs() },
@@ -85,6 +83,10 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
 
+    fun register(constructor: () -> FixMessage) {
+        msgTypeToJavaTypeMap[constructor.invoke().msgType] = constructor
+    }
+
 /*
     fun registerFieldSetter(name: String, setter: SetField) {
         setFieldByFieldNameMap[name] = setter
@@ -92,7 +94,7 @@ class ToObject(private val dictionary: FixDictionary) {
 */
 
     fun register(converter: TagConverter) {
-        setFieldByFieldNameMap[converter.getTagName()] =  { tag, field, source, dictionary ->
+        setFieldByFieldNameMap[converter.getTagName()] = { tag, field, source, dictionary ->
             converter.setField(source, field, this, tag)
         }
     }

@@ -6,7 +6,6 @@ import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import quickfix.Group
 import quickfix.Message
-import quickfix.field.MsgType
 import quickfix.field.NoLegs
 import quickfix.field.NoRelatedSym
 import java.lang.reflect.Field
@@ -28,27 +27,14 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     private val fo = FromObject(dictionary)
     private val to = ToObject(dictionary)
 
-/*
-    fun registerTagSetter(name: String, setter: SetTag) {
-        fo.registerTagSetter(name, setter)
-    }
-*/
-
-/*
-    fun registerFieldSetter(name: String, setter: SetField) {
-        to.registerFieldSetter(name, setter)
-    }
-*/
-
     fun register(converter: TagConverter) {
         fo.register(converter)
         to.register(converter)
     }
 
-    private val msgTypeToJavaTypeMap: Map<*, () -> FixMessage> = mapOf(
-        MsgType.ORDER_SINGLE to { NewOrderSingle() },
-        MsgType.QUOTE_REQUEST to { QuoteRequest() }
-    )
+    fun register(constructor: () -> FixMessage) {
+        to.register(constructor)
+    }
 
     private val componentToGroupMap: Map<*, GroupFactory> = mapOf(
         QuoteRequest.NoRelatedSym::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym() },

@@ -30,6 +30,7 @@ class NewOrderSingleConverterTest : GenericFixMessageConverterTestSupport() {
     @Before
     override fun before() {
         super.before()
+        converter.register { NewOrderSingle() }
         converter.register(TransactTimeConverter(dictionary))
     }
 
