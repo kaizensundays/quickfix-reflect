@@ -1,9 +1,6 @@
 package com.kaizensundays.fusion.quickfix
 
-import com.kaizensundays.fusion.quickfix.messages.SetField
-import com.kaizensundays.fusion.quickfix.messages.SetTag
 import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -47,8 +44,6 @@ val setTransactTimeTag: SetTag = { tag, field, obj, dictionary ->
     }
 }
 */
-
-fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
 /*
 val setTransactTimeField: SetField = { field, tag, msg, dictionary ->

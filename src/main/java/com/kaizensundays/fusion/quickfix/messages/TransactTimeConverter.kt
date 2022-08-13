@@ -1,11 +1,11 @@
 package com.kaizensundays.fusion.quickfix.messages
 
 import com.kaizensundays.fusion.quickfix.getValue
-import com.kaizensundays.fusion.quickfix.isFinal
 import com.kaizensundays.fusion.quickfix.toEpochMilli
 import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 
 /**
  * Created: Saturday 8/13/2022, 12:37 PM Eastern Time
@@ -17,6 +17,8 @@ class TransactTimeConverter(private val dictionary: FixDictionary) : TagConverte
     override fun getTagName(): String {
         return "TransactTime"
     }
+
+    private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
     private fun validate(tag: Int) {
         val fixField = dictionary.tagToFieldMap()[tag]
