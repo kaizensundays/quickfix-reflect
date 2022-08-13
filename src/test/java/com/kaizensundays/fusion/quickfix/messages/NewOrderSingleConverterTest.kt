@@ -32,8 +32,12 @@ class NewOrderSingleConverterTest : GenericFixMessageConverterTestSupport() {
     @Before
     override fun before() {
         super.before()
+        val transactTimeConverter = TransactTimeConverter(dictionary)
+        converter.register(transactTimeConverter)
+/*
         converter.registerTagSetter("TransactTime", setTransactTimeTag)
         converter.registerFieldSetter("TransactTime", setTransactTimeField)
+*/
     }
 
     @Test

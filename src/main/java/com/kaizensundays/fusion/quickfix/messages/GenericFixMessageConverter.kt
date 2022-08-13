@@ -28,12 +28,21 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     private val fo = FromObject(dictionary)
     private val to = ToObject(dictionary)
 
+/*
     fun registerTagSetter(name: String, setter: SetTag) {
         fo.registerTagSetter(name, setter)
     }
+*/
 
+/*
     fun registerFieldSetter(name: String, setter: SetField) {
         to.registerFieldSetter(name, setter)
+    }
+*/
+
+    fun register(converter: TagConverter) {
+        fo.register(converter)
+        to.register(converter)
     }
 
     private val msgTypeToJavaTypeMap: Map<*, () -> FixMessage> = mapOf(

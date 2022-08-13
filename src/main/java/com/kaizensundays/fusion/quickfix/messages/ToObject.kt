@@ -85,8 +85,16 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
 
+/*
     fun registerFieldSetter(name: String, setter: SetField) {
         setFieldByFieldNameMap[name] = setter
+    }
+*/
+
+    fun register(converter: TagConverter) {
+        setFieldByFieldNameMap[converter.getTagName()] =  { tag, field, source, dictionary ->
+            converter.setField(source, field, this, tag)
+        }
     }
 
     private val setDoubleField: SetField = { field, tag, msg, _ ->

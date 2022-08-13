@@ -75,8 +75,11 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
     @Before
     override fun before() {
         super.before()
-        converter.registerTagSetter("TransactTime", setTransactTimeTag)
-        to.registerFieldSetter("TransactTime", setTransactTimeField)
+        val transactTimeConverter = TransactTimeConverter(dictionary)
+        //converter.registerTagSetter("TransactTime", setTransactTimeTag)
+        converter.register(transactTimeConverter)
+        //to.registerFieldSetter("TransactTime", setTransactTimeField)
+        to.register(transactTimeConverter)
     }
 
     private fun setObjectFields(objs: Array<NewOrderSingle>) {
