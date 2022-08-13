@@ -179,7 +179,9 @@ class ToObject(private val dictionary: FixDictionary) {
 
     fun toObject(msg: Message): FixMessage {
 
-        val obj = msgTypeToJavaTypeMap[msg.header.getString(MsgType.FIELD)]?.invoke() ?: throw IllegalStateException()
+        val msgType = msg.header.getString(MsgType.FIELD)
+
+        val obj = msgTypeToJavaTypeMap[msgType]?.invoke() ?: throw IllegalStateException("Java class for msgType '$msgType' was not registered.")
 
         set(msg.header, FixMessage::class.java, obj)
 
