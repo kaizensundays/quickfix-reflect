@@ -33,6 +33,7 @@ inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
     }
 }
 
+/*
 val setTransactTimeTag: SetTag = { tag, field, obj, dictionary ->
 
     val fixField = dictionary.tagToFieldMap()[tag]
@@ -45,9 +46,11 @@ val setTransactTimeTag: SetTag = { tag, field, obj, dictionary ->
         this.setUtcTimeStamp(tag, toLocalDateTime(timestamp))
     }
 }
+*/
 
 fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
+/*
 val setTransactTimeField: SetField = { field, tag, msg, dictionary ->
 
     val fixField = dictionary.tagToFieldMap()[tag]
@@ -60,4 +63,5 @@ val setTransactTimeField: SetField = { field, tag, msg, dictionary ->
         field.set(this, value)
     }
 }
+*/
 

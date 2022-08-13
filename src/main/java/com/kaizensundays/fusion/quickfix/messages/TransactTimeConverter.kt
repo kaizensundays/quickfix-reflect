@@ -18,12 +18,16 @@ class TransactTimeConverter(private val dictionary: FixDictionary) : TagConverte
         return "TransactTime"
     }
 
-    override fun setTag(source: Any, field: Field, target: FieldMap, tag: Int) {
-
+    private fun validate(tag: Int) {
         val fixField = dictionary.tagToFieldMap()[tag]
         if ("UTCTIMESTAMP" != fixField?.type) {
             throw IllegalArgumentException()
         }
+    }
+
+    override fun setTag(source: Any, field: Field, target: FieldMap, tag: Int) {
+
+        validate(tag)
 
         source.getValue(field) { value ->
             val timestamp = value as Long
@@ -33,10 +37,7 @@ class TransactTimeConverter(private val dictionary: FixDictionary) : TagConverte
 
     override fun setField(source: FieldMap, tag: Int, target: Any, field: Field) {
 
-        val fixField = dictionary.tagToFieldMap()[tag]
-        if ("UTCTIMESTAMP" != fixField?.type) {
-            throw IllegalArgumentException()
-        }
+        validate(tag)
 
         if (source.isSetField(tag) && !field.isFinal()) {
             val value = toEpochMilli(source.getUtcTimeStamp(tag))
