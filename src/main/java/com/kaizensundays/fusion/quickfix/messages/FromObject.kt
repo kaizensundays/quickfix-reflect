@@ -36,7 +36,7 @@ class FromObject(private val dictionary: FixDictionary) {
 
     private val setTagByFieldNameMap: MutableMap<String, SetTag> = mutableMapOf()
 
-    fun registerSetTagByFieldName(name: String, setTag: SetTag) {
+    fun registerTagSetter(name: String, setTag: SetTag) {
         setTagByFieldNameMap[name] = setTag
     }
 

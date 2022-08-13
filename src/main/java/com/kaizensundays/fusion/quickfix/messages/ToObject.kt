@@ -85,7 +85,7 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
 
-    fun register(name: String, setter: SetField) {
+    fun registerFieldSetter(name: String, setter: SetField) {
         setFieldByFieldNameMap[name] = setter
     }
 
@@ -173,6 +173,7 @@ class ToObject(private val dictionary: FixDictionary) {
 
         set(msg.header, FixMessage::class.java, obj)
 
+        set(msg, obj.javaClass, obj)
 
         return obj
     }

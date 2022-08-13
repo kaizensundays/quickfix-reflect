@@ -75,8 +75,8 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
     @Before
     override fun before() {
         super.before()
-        converter.registerSetTagByFieldName("TransactTime", setTransactTimeTag)
-        to.register("TransactTime", setTransactTimeField)
+        converter.registerTagSetter("TransactTime", setTransactTimeTag)
+        to.registerFieldSetter("TransactTime", setTransactTimeField)
     }
 
     private fun setObjectFields(objs: Array<NewOrderSingle>) {

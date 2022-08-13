@@ -26,9 +26,14 @@ typealias GroupBeanFactory = () -> Any
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
     private val fo = FromObject(dictionary)
+    private val to = ToObject(dictionary)
 
-    fun registerSetTagByFieldName(name: String, setTag: SetTag) {
-        fo.registerSetTagByFieldName(name, setTag)
+    fun registerTagSetter(name: String, setter: SetTag) {
+        fo.registerTagSetter(name, setter)
+    }
+
+    fun registerFieldSetter(name: String, setter: SetField) {
+        to.registerFieldSetter(name, setter)
     }
 
     private val msgTypeToJavaTypeMap: Map<*, () -> FixMessage> = mapOf(
@@ -279,6 +284,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 
     override fun toObject(msg: Message): FixMessage {
 
+        return to.toObject(msg)
+
+/*
         val obj = msgTypeToJavaTypeMap[msg.header.getString(MsgType.FIELD)]?.invoke() ?: throw IllegalStateException()
 
         msg.header.getFields(FixMessage::class.java, obj)
@@ -295,6 +303,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
 
         return obj
+*/
     }
 
 }

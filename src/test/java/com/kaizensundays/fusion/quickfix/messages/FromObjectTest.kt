@@ -76,7 +76,7 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
     @Before
     override fun before() {
         super.before()
-        fo.registerSetTagByFieldName("TransactTime", setTransactTimeTag)
+        fo.registerTagSetter("TransactTime", setTransactTimeTag)
     }
 
     @Test
