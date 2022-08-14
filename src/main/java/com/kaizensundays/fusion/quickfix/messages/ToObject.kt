@@ -82,11 +82,10 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private fun findFixGroups(type: Class<out Any>, map: MutableMap<String, FixGroup>): MutableMap<String, FixGroup> {
 
-        val gx = type.declaredClasses.filter { c -> FixGroup::class.java.isAssignableFrom(c) } as List<Class<FixGroup>>
+        val groups = type.declaredClasses.filterIsInstance<Class<FixGroup>>()
 
-        gx.forEach { c ->
-            val key = c.canonicalName
-            map[key] = c.newInstance()
+        groups.forEach { c ->
+            map[c.canonicalName] = c.newInstance()
             findFixGroups(c, map)
         }
 

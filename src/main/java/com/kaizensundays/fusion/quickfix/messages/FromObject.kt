@@ -56,7 +56,7 @@ class FromObject(private val dictionary: FixDictionary) {
         val list = field.get(obj)
         if (list is List<*>) {
             list.filterIsInstance<FixGroup>().forEach { fixGroup ->
-                val group = fixGroup.create()
+                val group = fixGroup.createQuickFixGroup()
                 if (!target.isSetField(group.fieldTag)) {
                     target.setInt(group.fieldTag, list.size)
                 }

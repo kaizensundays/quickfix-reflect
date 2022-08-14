@@ -21,7 +21,7 @@ public class QuoteRequest extends FixMessage {
     public static class NoRelatedSym implements FixGroup {
         @NotNull
         @Override
-        public Group create() {
+        public Group createQuickFixGroup() {
             return new quickfix.fix44.QuoteRequest.NoRelatedSym();
         }
 
@@ -37,7 +37,7 @@ public class QuoteRequest extends FixMessage {
         public static class NoLegs implements FixGroup {
             @NotNull
             @Override
-            public Group create() {
+            public Group createQuickFixGroup() {
                 return new quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs();
             }
 

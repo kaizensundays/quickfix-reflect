@@ -9,7 +9,7 @@ import quickfix.Group
  */
 interface FixGroup {
 
-    fun create(): Group
+    fun createQuickFixGroup(): Group
 
     fun createGroup(): FixGroup
 
