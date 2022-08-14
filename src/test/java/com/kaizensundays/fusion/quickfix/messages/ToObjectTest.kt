@@ -78,6 +78,15 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
         to.register(transactTimeConverter)
     }
 
+    @Test
+    fun findFixGroups() {
+
+        val type = QuoteRequest::class.java
+
+        val map = to.findFixGroups(QuoteRequest::class.java)
+
+    }
+
     private fun setObjectFields(objs: Array<NewOrderSingle>) {
 
         objs.forEachIndexed { i, _ ->

@@ -88,11 +88,15 @@ class ToObject(private val dictionary: FixDictionary) {
         msgTypeToJavaTypeMap[factory.get().msgType] = factory
     }
 
-/*
-    fun registerFieldSetter(name: String, setter: SetField) {
-        setFieldByFieldNameMap[name] = setter
+    fun findFixGroups(type: Class<out FixMessage>): Map<String, FixGroup> {
+
+        val gx = type.declaredClasses.filter { c -> FixGroup::class.java.isAssignableFrom(c) } as List<Class<FixGroup>>
+
+        val map = gx.map { g -> g.simpleName to g.newInstance() }.toMap()
+
+        return map
     }
-*/
+
 
     fun register(converter: TagConverter) {
         setFieldByFieldNameMap[converter.getTagName()] = { tag, field, source, dictionary ->
