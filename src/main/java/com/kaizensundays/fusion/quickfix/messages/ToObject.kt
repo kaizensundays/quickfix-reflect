@@ -17,7 +17,7 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private val msgTypeToJavaTypeMap: MutableMap<String, Supplier<FixMessage>> = mutableMapOf()
 
-    private val classNameToFixGroupMap: Map<*, FixGroup> = mapOf(
+    private val classNameToFixGroupMap: MutableMap<String, FixGroup> = mutableMapOf(
         "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym" to QuoteRequest.NoRelatedSym(),
         "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym.NoLegs" to QuoteRequest.NoRelatedSym.NoLegs(),
     )
@@ -83,16 +83,14 @@ class ToObject(private val dictionary: FixDictionary) {
     private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
 
     fun register(factory: Supplier<FixMessage>) {
-        msgTypeToJavaTypeMap[factory.get().msgType] = factory
-    }
 
-    fun classKey(type: Class<out Any>): String {
+        val msg = factory.get()
 
-        val packageName = type.canonicalName.replace(type.simpleName, "")
+        msgTypeToJavaTypeMap[msg.msgType] = factory
 
-        val k = type.canonicalName.replace(packageName, "")
+        val map = findFixGroups(msg.javaClass)
+        classNameToFixGroupMap.putAll(map)
 
-        return k
     }
 
     private fun findFixGroups(type: Class<out Any>, map: MutableMap<String, FixGroup>): MutableMap<String, FixGroup> {

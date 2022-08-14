@@ -79,14 +79,6 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
     }
 
     @Test
-    fun classKey() {
-
-        //assertEquals("?", to.classKey(QuoteRequest::class.java))
-        //assertEquals("QuoteRequest.NoRelatedSym", to.classKey(QuoteRequest.NoRelatedSym::class.java))
-
-    }
-
-    @Test
     fun findFixGroups() {
 
         var map = to.findFixGroups(NewOrderSingle::class.java)
