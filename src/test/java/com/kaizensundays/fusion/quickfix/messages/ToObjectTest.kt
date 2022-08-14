@@ -76,6 +76,7 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
         val transactTimeConverter = TransactTimeConverter(dictionary)
         converter.register(transactTimeConverter)
         to.register(transactTimeConverter)
+        to.register { QuoteRequest() }
     }
 
     @Test

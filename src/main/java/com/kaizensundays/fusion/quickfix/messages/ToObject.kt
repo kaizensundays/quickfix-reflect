@@ -17,10 +17,7 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private val msgTypeToJavaTypeMap: MutableMap<String, Supplier<FixMessage>> = mutableMapOf()
 
-    private val classNameToFixGroupMap: MutableMap<String, FixGroup> = mutableMapOf(
-        "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym" to QuoteRequest.NoRelatedSym(),
-        "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym.NoLegs" to QuoteRequest.NoRelatedSym.NoLegs(),
-    )
+    private val classNameToFixGroupMap: MutableMap<String, FixGroup> = mutableMapOf()
 
     private fun tag(fieldName: String): Int? {
         val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
