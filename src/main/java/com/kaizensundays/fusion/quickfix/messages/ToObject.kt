@@ -4,8 +4,6 @@ import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import quickfix.FieldMap
 import quickfix.Message
 import quickfix.field.MsgType
-import quickfix.field.NoLegs
-import quickfix.field.NoRelatedSym
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.util.function.Supplier
@@ -18,11 +16,6 @@ import java.util.function.Supplier
 class ToObject(private val dictionary: FixDictionary) {
 
     private val msgTypeToJavaTypeMap: MutableMap<String, Supplier<FixMessage>> = mutableMapOf()
-
-    private val tagToGroupBeanMap: Map<*, GroupBeanFactory> = mapOf(
-        NoRelatedSym.FIELD to { QuoteRequest.NoRelatedSym() },
-        NoLegs.FIELD to { QuoteRequest.NoRelatedSym.NoLegs() },
-    )
 
     private val classNameToFixGroupMap: Map<*, FixGroup> = mapOf(
         "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym" to QuoteRequest.NoRelatedSym(),
@@ -102,14 +95,14 @@ class ToObject(private val dictionary: FixDictionary) {
         return k
     }
 
-    private fun findFixGroups(type: Class<out Any>, packageName: String, map: MutableMap<String, FixGroup>): MutableMap<String, FixGroup> {
+    private fun findFixGroups(type: Class<out Any>, map: MutableMap<String, FixGroup>): MutableMap<String, FixGroup> {
 
         val gx = type.declaredClasses.filter { c -> FixGroup::class.java.isAssignableFrom(c) } as List<Class<FixGroup>>
 
         gx.forEach { c ->
             val key = c.canonicalName
             map[key] = c.newInstance()
-            findFixGroups(c, packageName, map)
+            findFixGroups(c, map)
         }
 
         return map
@@ -117,9 +110,7 @@ class ToObject(private val dictionary: FixDictionary) {
 
     fun findFixGroups(type: Class<out Any>): Map<String, FixGroup> {
 
-        val packageName = type.canonicalName.replace(type.simpleName, "")
-
-        return findFixGroups(type, packageName, mutableMapOf())
+        return findFixGroups(type, mutableMapOf())
     }
 
 
@@ -167,7 +158,6 @@ class ToObject(private val dictionary: FixDictionary) {
         if (source.isSetField(tag)) {
             val groups = source.getGroups(tag)
             groups.forEach { group ->
-                //-val factory = tagToGroupBeanMap[tag]
                 val key = target.javaClass.canonicalName + "." + field.name.firstCharToUpper()
                 val factory = classNameToFixGroupMap[key]
                 if (factory != null) {
