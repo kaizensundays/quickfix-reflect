@@ -24,6 +24,11 @@ class ToObject(private val dictionary: FixDictionary) {
         NoLegs.FIELD to { QuoteRequest.NoRelatedSym.NoLegs() },
     )
 
+    private val fieldToGroupBeanMap: Map<*, GroupBeanFactory> = mapOf(
+        "QuoteRequest.NoRelatedSym" to { QuoteRequest.NoRelatedSym() },
+        "QuoteRequest.NoRelatedSym.NoLegs" to { QuoteRequest.NoRelatedSym.NoLegs() },
+    )
+
     private fun tag(fieldName: String): Int? {
         val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
         return field?.number?.toInt()
@@ -89,13 +94,14 @@ class ToObject(private val dictionary: FixDictionary) {
     }
 
 
-    private fun findFixGroups(type: Class<out Any>, map: MutableMap<String, FixGroup>): MutableMap<String, FixGroup> {
+    private fun findFixGroups(type: Class<out Any>, packageName: String, map: MutableMap<String, FixGroup>): MutableMap<String, FixGroup> {
 
         val gx = type.declaredClasses.filter { c -> FixGroup::class.java.isAssignableFrom(c) } as List<Class<FixGroup>>
 
         gx.forEach { c ->
-            map[c.simpleName.firstCharToUpper()] = c.newInstance()
-            findFixGroups(c, map)
+            val key = c.canonicalName.replace(packageName, "")
+            map[key] = c.newInstance()
+            findFixGroups(c, packageName, map)
         }
 
         return map
@@ -103,7 +109,9 @@ class ToObject(private val dictionary: FixDictionary) {
 
     fun findFixGroups(type: Class<out Any>): Map<String, FixGroup> {
 
-        return findFixGroups(type, mutableMapOf())
+        val packageName = type.canonicalName.replace(type.simpleName, "")
+
+        return findFixGroups(type, packageName, mutableMapOf())
     }
 
 
