@@ -63,12 +63,6 @@ class ToObject(private val dictionary: FixDictionary) {
     private val setLongField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag) && !field.isFinal()) {
             when (fixType(tag)) {
-/*
-                "UTCTIMESTAMP" -> {
-                    val value = toEpochMilli(msg.getUtcTimeStamp(tag))
-                    field.set(this, value)
-                }
-*/
                 "MONTHYEAR" -> {
                     val value = msg.getInt(tag).toLong()
                     field.set(this, value)

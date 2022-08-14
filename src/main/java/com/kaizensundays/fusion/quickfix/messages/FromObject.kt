@@ -36,12 +36,6 @@ class FromObject(private val dictionary: FixDictionary) {
 
     private val setTagByFieldNameMap: MutableMap<String, SetTag> = mutableMapOf()
 
-/*
-    fun registerTagSetter(name: String, setTag: SetTag) {
-        setTagByFieldNameMap[name] = setTag
-    }
-*/
-
     fun register(converter: TagConverter) {
         setTagByFieldNameMap[converter.getTagName()] = { tag, field, source, dictionary ->
             converter.setTag(source, field, this, tag)
