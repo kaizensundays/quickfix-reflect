@@ -81,10 +81,10 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
     @Test
     fun findFixGroups() {
 
-        val type = QuoteRequest::class.java
-
         val map = to.findFixGroups(QuoteRequest::class.java)
 
+        assertEquals(2, map.size)
+        assertEquals(sortedSetOf("NoLegs", "NoRelatedSym"), map.keys.toSortedSet())
     }
 
     private fun setObjectFields(objs: Array<NewOrderSingle>) {

@@ -88,13 +88,22 @@ class ToObject(private val dictionary: FixDictionary) {
         msgTypeToJavaTypeMap[factory.get().msgType] = factory
     }
 
-    fun findFixGroups(type: Class<out FixMessage>): Map<String, FixGroup> {
+
+    private fun findFixGroups(type: Class<out Any>, map: MutableMap<String, FixGroup>): MutableMap<String, FixGroup> {
 
         val gx = type.declaredClasses.filter { c -> FixGroup::class.java.isAssignableFrom(c) } as List<Class<FixGroup>>
 
-        val map = gx.map { g -> g.simpleName to g.newInstance() }.toMap()
+        gx.forEach { c ->
+            map[c.simpleName.firstCharToUpper()] = c.newInstance()
+            findFixGroups(c, map)
+        }
 
         return map
+    }
+
+    fun findFixGroups(type: Class<out Any>): Map<String, FixGroup> {
+
+        return findFixGroups(type, mutableMapOf())
     }
 
 
