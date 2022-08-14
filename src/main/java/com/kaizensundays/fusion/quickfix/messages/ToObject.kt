@@ -8,6 +8,7 @@ import quickfix.field.NoLegs
 import quickfix.field.NoRelatedSym
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+import java.util.function.Supplier
 
 /**
  * Created: Saturday 7/30/2022, 12:57 PM Eastern Time
@@ -16,7 +17,7 @@ import java.lang.reflect.Modifier
  */
 class ToObject(private val dictionary: FixDictionary) {
 
-    private val msgTypeToJavaTypeMap: MutableMap<String, () -> FixMessage> = mutableMapOf()
+    private val msgTypeToJavaTypeMap: MutableMap<String, Supplier<FixMessage>> = mutableMapOf()
 
     private val tagToGroupBeanMap: Map<*, GroupBeanFactory> = mapOf(
         NoRelatedSym.FIELD to { QuoteRequest.NoRelatedSym() },
@@ -83,8 +84,8 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
 
-    fun register(constructor: () -> FixMessage) {
-        msgTypeToJavaTypeMap[constructor.invoke().msgType] = constructor
+    fun register(factory: Supplier<FixMessage>) {
+        msgTypeToJavaTypeMap[factory.get().msgType] = factory
     }
 
 /*
@@ -181,7 +182,7 @@ class ToObject(private val dictionary: FixDictionary) {
 
         val msgType = msg.header.getString(MsgType.FIELD)
 
-        val obj = msgTypeToJavaTypeMap[msgType]?.invoke() ?: throw IllegalStateException("Java class for msgType '$msgType' was not registered.")
+        val obj = msgTypeToJavaTypeMap[msgType]?.get() ?: throw IllegalStateException("Java class for msgType '$msgType' was not registered.")
 
         set(msg.header, FixMessage::class.java, obj)
 

@@ -10,6 +10,7 @@ import quickfix.field.NoLegs
 import quickfix.field.NoRelatedSym
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+import java.util.function.Supplier
 
 /**
  * Created: Saturday 6/25/2022, 12:32 PM Eastern Time
@@ -32,8 +33,8 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         to.register(converter)
     }
 
-    fun register(constructor: () -> FixMessage) {
-        to.register(constructor)
+    fun register(factory: Supplier<FixMessage>) {
+        to.register(factory)
     }
 
 /*
