@@ -62,12 +62,8 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private val setLongField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag) && !field.isFinal()) {
-            when (fixType(tag)) {
-                "MONTHYEAR" -> {
-                    val value = msg.getInt(tag).toLong()
-                    field.set(this, value)
-                }
-            }
+            val value = msg.getDecimal(tag)
+            field.set(this, value.toLong())
         }
     }
 
