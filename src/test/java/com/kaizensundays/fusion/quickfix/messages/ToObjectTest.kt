@@ -79,6 +79,14 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
     }
 
     @Test
+    fun classKey() {
+
+        //assertEquals("?", to.classKey(QuoteRequest::class.java))
+        //assertEquals("QuoteRequest.NoRelatedSym", to.classKey(QuoteRequest.NoRelatedSym::class.java))
+
+    }
+
+    @Test
     fun findFixGroups() {
 
         var map = to.findFixGroups(NewOrderSingle::class.java)
@@ -89,7 +97,12 @@ class ToObjectTest : GenericFixMessageConverterTestSupport() {
         map = to.findFixGroups(QuoteRequest::class.java)
 
         assertEquals(2, map.size)
-        assertEquals(sortedSetOf("QuoteRequest.NoRelatedSym", "QuoteRequest.NoRelatedSym.NoLegs"), map.keys.toSortedSet())
+        assertEquals(
+            sortedSetOf(
+                "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym",
+                "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym.NoLegs"
+            ), map.keys.toSortedSet()
+        )
     }
 
     private fun setObjectFields(objs: Array<NewOrderSingle>) {

@@ -24,9 +24,9 @@ class ToObject(private val dictionary: FixDictionary) {
         NoLegs.FIELD to { QuoteRequest.NoRelatedSym.NoLegs() },
     )
 
-    private val fieldToGroupBeanMap: Map<*, GroupBeanFactory> = mapOf(
-        "QuoteRequest.NoRelatedSym" to { QuoteRequest.NoRelatedSym() },
-        "QuoteRequest.NoRelatedSym.NoLegs" to { QuoteRequest.NoRelatedSym.NoLegs() },
+    private val classNameToFixGroupMap: Map<*, GroupBeanFactory> = mapOf(
+        "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym" to { QuoteRequest.NoRelatedSym() },
+        "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym.NoLegs" to { QuoteRequest.NoRelatedSym.NoLegs() },
     )
 
     private fun tag(fieldName: String): Int? {
@@ -93,13 +93,21 @@ class ToObject(private val dictionary: FixDictionary) {
         msgTypeToJavaTypeMap[factory.get().msgType] = factory
     }
 
+    fun classKey(type: Class<out Any>): String {
+
+        val packageName = type.canonicalName.replace(type.simpleName, "")
+
+        val k = type.canonicalName.replace(packageName, "")
+
+        return k
+    }
 
     private fun findFixGroups(type: Class<out Any>, packageName: String, map: MutableMap<String, FixGroup>): MutableMap<String, FixGroup> {
 
         val gx = type.declaredClasses.filter { c -> FixGroup::class.java.isAssignableFrom(c) } as List<Class<FixGroup>>
 
         gx.forEach { c ->
-            val key = c.canonicalName.replace(packageName, "")
+            val key = c.canonicalName
             map[key] = c.newInstance()
             findFixGroups(c, packageName, map)
         }
@@ -159,7 +167,9 @@ class ToObject(private val dictionary: FixDictionary) {
         if (source.isSetField(tag)) {
             val groups = source.getGroups(tag)
             groups.forEach { group ->
-                val factory = tagToGroupBeanMap[tag]
+                //-val factory = tagToGroupBeanMap[tag]
+                val key = target.javaClass.canonicalName + "." + field.name.firstCharToUpper()
+                val factory = classNameToFixGroupMap[key]
                 if (factory != null) {
                     val groupBean = factory.invoke()
                     set(group, groupBean.javaClass, groupBean)
