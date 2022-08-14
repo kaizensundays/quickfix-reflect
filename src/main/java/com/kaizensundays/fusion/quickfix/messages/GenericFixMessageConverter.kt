@@ -19,7 +19,7 @@ import java.lang.reflect.Modifier
 typealias SetTag = FieldMap.(Int, Field, Any, FixDictionary) -> Unit
 typealias SetField = Any.(Field, Int, FieldMap, FixDictionary) -> Unit
 
-typealias GroupFactory = () -> Group
+//typealias GroupFactory = () -> Group
 typealias GroupBeanFactory = () -> Any
 
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
@@ -36,6 +36,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         to.register(constructor)
     }
 
+/*
     private val componentToGroupMap: Map<*, GroupFactory> = mapOf(
         QuoteRequest.NoRelatedSym::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym() },
         QuoteRequest.NoRelatedSym.NoLegs::class.java to { quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs() }
@@ -45,11 +46,15 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         NoRelatedSym.FIELD to { QuoteRequest.NoRelatedSym() },
         NoLegs.FIELD to { QuoteRequest.NoRelatedSym.NoLegs() },
     )
+*/
 
+/*
     private val groupFactory: (component: Any) -> Group? = { component ->
         componentToGroupMap[component.javaClass]?.invoke()
     }
+*/
 
+/*
     private inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
         val value = field.get(this)
         if (value != null) {
@@ -89,7 +94,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
     val setDoubleTag: SetTag = { tag, field, obj, _ ->
         obj.getValue(field) { value -> this.setDouble(tag, value as Double) }
     }
+*/
 
+/*
     val setCharField: SetField = { field, tag, msg, _ ->
         if (msg.isSetField(tag)) {
             val value = msg.getChar(tag)
@@ -140,7 +147,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
             }
         }
     }
+*/
 
+/*
     val setTagMap: Map<Class<*>, SetTag> = mapOf(
         Character::class.java to setCharTag,
         String::class.java to setStringTag,
@@ -148,7 +157,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         java.lang.Long::class.java to setLongTag,
         java.lang.Double::class.java to setDoubleTag,
     )
+*/
 
+/*
     private val setFieldMap: Map<Class<*>, SetField> = mapOf(
         Character::class.java to setCharField,
         String::class.java to setStringField,
@@ -156,21 +167,29 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         java.lang.Long::class.java to setLongField,
         java.lang.Double::class.java to setDoubleField,
     )
+*/
 
+/*
     private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
+*/
 
+/*
     private fun Field.isList() = this.type.equals(List::class.java)
 
     private fun tag(fieldName: String): Int? {
         val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
         return field?.number?.toInt()
     }
+*/
 
+/*
     fun fixType(tag: Int): String {
         val field = dictionary.tagToFieldMap()[tag]
         return if (field != null) field.type else "?"
     }
+*/
 
+/*
     fun FieldMap.set(field: Field, obj: Any) {
 
         val tag = tag(field.name)
@@ -196,7 +215,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
             }
         }
     }
+*/
 
+/*
     fun FieldMap.setFields(type: Class<*>, obj: Any) {
 
         val fieldMap = type.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
@@ -212,6 +233,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         }
 
     }
+*/
 
     override fun fromObject(obj: FixMessage): Message {
 
@@ -227,6 +249,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
 */
     }
 
+/*
     fun Field.getGroups(obj: Any): MutableList<Any> {
         var list = this.get(obj)
         if (list == null) {
@@ -243,7 +266,9 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
         @Suppress("UNCHECKED_CAST")
         return list as MutableList<Any>
     }
+*/
 
+/*
     fun FieldMap.getFields(type: Class<*>, obj: Any) {
 
         val fieldMap = type.declaredFields.map { f -> f.name.firstCharToUpper() to f }.toMap()
@@ -276,6 +301,7 @@ class GenericFixMessageConverter(private val dictionary: FixDictionary) : Object
             }
         }
     }
+*/
 
     override fun toObject(msg: Message): FixMessage {
 
