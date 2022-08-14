@@ -25,6 +25,12 @@ public class QuoteRequest extends FixMessage {
             return new quickfix.fix44.QuoteRequest.NoRelatedSym();
         }
 
+        @NotNull
+        @Override
+        public FixGroup createGroup() {
+            return new NoRelatedSym();
+        }
+
         public Integer quoteType;
         public List<NoLegs> noLegs;
 
@@ -33,6 +39,12 @@ public class QuoteRequest extends FixMessage {
             @Override
             public Group create() {
                 return new quickfix.fix44.QuoteRequest.NoRelatedSym.NoLegs();
+            }
+
+            @NotNull
+            @Override
+            public FixGroup createGroup() {
+                return new NoLegs();
             }
 
             public String legSymbol;

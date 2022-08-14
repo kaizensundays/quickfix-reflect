@@ -24,9 +24,9 @@ class ToObject(private val dictionary: FixDictionary) {
         NoLegs.FIELD to { QuoteRequest.NoRelatedSym.NoLegs() },
     )
 
-    private val classNameToFixGroupMap: Map<*, GroupBeanFactory> = mapOf(
-        "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym" to { QuoteRequest.NoRelatedSym() },
-        "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym.NoLegs" to { QuoteRequest.NoRelatedSym.NoLegs() },
+    private val classNameToFixGroupMap: Map<*, FixGroup> = mapOf(
+        "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym" to QuoteRequest.NoRelatedSym(),
+        "com.kaizensundays.fusion.quickfix.messages.QuoteRequest.NoRelatedSym.NoLegs" to QuoteRequest.NoRelatedSym.NoLegs(),
     )
 
     private fun tag(fieldName: String): Int? {
@@ -171,7 +171,7 @@ class ToObject(private val dictionary: FixDictionary) {
                 val key = target.javaClass.canonicalName + "." + field.name.firstCharToUpper()
                 val factory = classNameToFixGroupMap[key]
                 if (factory != null) {
-                    val groupBean = factory.invoke()
+                    val groupBean = factory.createGroup()
                     set(group, groupBean.javaClass, groupBean)
                     val list = field.getGroups(target)
                     list.add(groupBean)

@@ -11,4 +11,6 @@ interface FixGroup {
 
     fun create(): Group
 
+    fun createGroup(): FixGroup
+
 }
