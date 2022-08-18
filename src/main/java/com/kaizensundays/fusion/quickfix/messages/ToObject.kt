@@ -3,6 +3,7 @@ package com.kaizensundays.fusion.quickfix.messages
 import quickfix.FieldMap
 import quickfix.Message
 import quickfix.field.MsgType
+import quickfix.field.converter.CharConverter
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.util.function.Supplier
@@ -34,22 +35,21 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
-    private val setCharField: SetField = { field, tag, msg, _ ->
-        if (msg.isSetField(tag)) {
-            val value = msg.getChar(tag)
-            if (!field.isFinal()) {
-                field.set(this, value)
+    private inline fun FieldMap.get(tag: Int, field: Field, setter: (String) -> Unit) {
+        if (this.isSetField(tag) && !field.isFinal()) {
+            val value = this.getString(tag)
+            if (value != null) {
+                setter.invoke(value)
             }
         }
     }
 
+    private val setCharField: SetField = { field, tag, msg, _ ->
+        msg.get(tag, field) { value -> field.set(this, CharConverter.convert(value)) }
+    }
+
     private val setStringField: SetField = { field, tag, msg, _ ->
-        if (msg.isSetField(tag)) {
-            val value = msg.getString(tag)
-            if (!field.isFinal()) {
-                field.set(this, value)
-            }
-        }
+        msg.get(tag, field) { value -> field.set(this, value) }
     }
 
     private val setIntField: SetField = { field, tag, msg, _ ->
