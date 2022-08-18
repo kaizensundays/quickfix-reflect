@@ -5,6 +5,7 @@ import quickfix.Message
 import quickfix.field.MsgType
 import quickfix.field.converter.CharConverter
 import quickfix.field.converter.DecimalConverter
+import quickfix.field.converter.DoubleConverter
 import quickfix.field.converter.IntConverter
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -62,6 +63,16 @@ class ToObject(private val dictionary: FixDictionary) {
         set(field, tag, msg) { value -> DecimalConverter.convert(value) }
     }
 
+    private val setDoubleField: SetField = { field, tag, msg, _ ->
+        set(field, tag, msg) { value -> DoubleConverter.convert(value) }
+    }
+
+    fun register(converter: TagConverter) {
+        setFieldByFieldNameMap[converter.getTagName()] = { tag, field, source, _ ->
+            converter.setField(source, field, this, tag)
+        }
+    }
+
     private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
 
     fun register(factory: Supplier<FixMessage>) {
@@ -84,20 +95,6 @@ class ToObject(private val dictionary: FixDictionary) {
             }
     }
 
-    fun register(converter: TagConverter) {
-        setFieldByFieldNameMap[converter.getTagName()] = { tag, field, source, dictionary ->
-            converter.setField(source, field, this, tag)
-        }
-    }
-
-    private val setDoubleField: SetField = { field, tag, msg, _ ->
-        if (msg.isSetField(tag)) {
-            val value = msg.getDouble(tag)
-            if (!field.isFinal()) {
-                field.set(this, value)
-            }
-        }
-    }
 
     private val setFieldMap: Map<Class<*>, SetField> = mapOf(
         Character::class.java to setCharField,
