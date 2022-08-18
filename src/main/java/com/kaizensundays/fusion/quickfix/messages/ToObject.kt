@@ -47,28 +47,28 @@ class ToObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private val setStringField: SetField = { field, tag, msg, _ ->
+    private val setStringField: SetField = { field, tag, msg ->
         set(field, tag, msg) { value -> value }
     }
 
-    private val setCharField: SetField = { field, tag, msg, _ ->
+    private val setCharField: SetField = { field, tag, msg ->
         set(field, tag, msg) { value -> CharConverter.convert(value) }
     }
 
-    private val setIntField: SetField = { field, tag, msg, _ ->
+    private val setIntField: SetField = { field, tag, msg ->
         set(field, tag, msg) { value -> IntConverter.convert(value) }
     }
 
-    private val setLongField: SetField = { field, tag, msg, _ ->
+    private val setLongField: SetField = { field, tag, msg ->
         set(field, tag, msg) { value -> DecimalConverter.convert(value) }
     }
 
-    private val setDoubleField: SetField = { field, tag, msg, _ ->
+    private val setDoubleField: SetField = { field, tag, msg ->
         set(field, tag, msg) { value -> DoubleConverter.convert(value) }
     }
 
     fun register(converter: TagConverter) {
-        setFieldByFieldNameMap[converter.getTagName()] = { tag, field, source, _ ->
+        setFieldByFieldNameMap[converter.getTagName()] = { tag, field, source ->
             converter.setField(source, field, this, tag)
         }
     }
@@ -140,11 +140,11 @@ class ToObject(private val dictionary: FixDictionary) {
     private fun setField(source: FieldMap, tag: Int, field: Field, target: Any) {
         var setField = setFieldByFieldNameMap[field.name.firstCharToUpper()]
         if (setField != null) {
-            target.setField(field, tag, source, dictionary)
+            target.setField(field, tag, source)
         } else {
             setField = setFieldMap[field.type]
             if (setField != null) {
-                target.setField(field, tag, source, dictionary)
+                target.setField(field, tag, source)
             }
         }
     }

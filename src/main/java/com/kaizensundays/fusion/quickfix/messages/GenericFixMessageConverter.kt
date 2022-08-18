@@ -11,10 +11,7 @@ import java.util.function.Supplier
  * @author Sergey Chuykov
  */
 typealias SetTag = FieldMap.(Int, Field, Any, FixDictionary) -> Unit
-typealias SetField = Any.(Field, Int, FieldMap, FixDictionary) -> Unit
-
-//typealias GroupFactory = () -> Group
-typealias GroupBeanFactory = () -> Any
+typealias SetField = Any.(Field, Int, FieldMap) -> Unit
 
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 
