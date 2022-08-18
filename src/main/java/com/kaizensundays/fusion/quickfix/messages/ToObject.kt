@@ -37,29 +37,29 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
-    private inline fun FieldMap.get(tag: Int, field: Field, setter: (String) -> Unit) {
-        if (this.isSetField(tag) && !field.isFinal()) {
-            val value = this.getString(tag)
+    private inline fun Any.set(field: Field, tag: Int, source: FieldMap, convert: (String) -> Any) {
+        if (source.isSetField(tag) && !field.isFinal()) {
+            val value = source.getString(tag)
             if (value != null) {
-                setter.invoke(value)
+                field.set(this, convert.invoke(value))
             }
         }
     }
 
     private val setStringField: SetField = { field, tag, msg, _ ->
-        msg.get(tag, field) { value -> field.set(this, value) }
+        set(field, tag, msg) { value -> value }
     }
 
     private val setCharField: SetField = { field, tag, msg, _ ->
-        msg.get(tag, field) { value -> field.set(this, CharConverter.convert(value)) }
+        set(field, tag, msg) { value -> CharConverter.convert(value) }
     }
 
     private val setIntField: SetField = { field, tag, msg, _ ->
-        msg.get(tag, field) { value -> field.set(this, IntConverter.convert(value)) }
+        set(field, tag, msg) { value -> IntConverter.convert(value) }
     }
 
     private val setLongField: SetField = { field, tag, msg, _ ->
-        msg.get(tag, field) { value -> field.set(this, DecimalConverter.convert(value)) }
+        set(field, tag, msg) { value -> DecimalConverter.convert(value) }
     }
 
     private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
