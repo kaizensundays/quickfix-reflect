@@ -26,13 +26,13 @@ class TransactTimeConverterTest : GenericFixMessageConverterTestSupport() {
                 LocalDateTime.of(2022, 7, 3, 17, 11, 3),
                 LocalDateTime.of(2023, 11, 7, 7, 31, 1),
             )
-        ).forEach { (exp, date) ->
+        ).forEach { (expected, date) ->
 
             val ts = obj.toEpochMilli(date)
 
             val ldt = obj.toLocalDateTime(ts)
 
-            assertEquals(exp, ldt.toString())
+            assertEquals(expected, ldt.toString())
         }
 
     }
