@@ -13,9 +13,9 @@ abstract class GenericFixMessageConverterTestSupport {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    val factory = TestMessageFactory()
-
     val dictionary = FixDictionary("FIX44.xml")
+
+    val factory = TestMessageFactory(dictionary)
 
     val converter = GenericFixMessageConverter(dictionary)
 

@@ -1,6 +1,5 @@
 package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import quickfix.FieldMap
 import quickfix.Message
 import quickfix.field.MsgType
@@ -18,6 +17,8 @@ class ToObject(private val dictionary: FixDictionary) {
     private val msgTypeToJavaTypeMap: MutableMap<String, Supplier<FixMessage>> = mutableMapOf()
 
     private val classNameToFixGroupMap: MutableMap<String, FixGroup> = mutableMapOf()
+
+    private fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
 
     private fun tag(fieldName: String): Int? {
         val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]

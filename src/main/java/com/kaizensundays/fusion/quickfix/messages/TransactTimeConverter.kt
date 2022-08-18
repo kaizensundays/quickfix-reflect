@@ -1,10 +1,11 @@
 package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.toEpochMilli
-import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 /**
  * Created: Saturday 8/13/2022, 12:37 PM Eastern Time
@@ -24,6 +25,16 @@ class TransactTimeConverter(private val dictionary: FixDictionary) : TagConverte
         if (value != null) {
             set(value)
         }
+    }
+
+    fun toLocalDateTime(timestamp: Long): LocalDateTime {
+        val inst = Instant.ofEpochMilli(timestamp)
+        return LocalDateTime.ofEpochSecond(inst.epochSecond, inst.nano, ZoneOffset.UTC)
+    }
+
+
+    fun toEpochMilli(ldt: LocalDateTime): Long {
+        return ldt.toInstant(ZoneOffset.UTC).toEpochMilli()
     }
 
     private fun validate(tag: Int) {

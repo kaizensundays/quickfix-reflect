@@ -1,15 +1,8 @@
 package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.firstCharToUpper
-import com.kaizensundays.fusion.quickfix.toEpochMilli
-import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
-import quickfix.Group
 import quickfix.Message
-import quickfix.field.NoLegs
-import quickfix.field.NoRelatedSym
 import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 import java.util.function.Supplier
 
 /**

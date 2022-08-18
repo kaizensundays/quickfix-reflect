@@ -1,6 +1,5 @@
 package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.toEpochMilli
 import quickfix.FixVersions
 import java.time.LocalDateTime
 import java.util.*
@@ -10,7 +9,9 @@ import java.util.*
  *
  * @author Sergey Chuykov
  */
-class TestMessageFactory {
+class TestMessageFactory(dictionary: FixDictionary) {
+
+    private val ttc = TransactTimeConverter(dictionary)
 
     fun newOrderSingle(side: Char, orderQty: Double, symbol: String): NewOrderSingle {
         val obj = NewOrderSingle()
@@ -22,7 +23,7 @@ class TestMessageFactory {
         obj.orderQty = orderQty
         obj.symbol = symbol
         obj.maturityMonthYear = 20220715
-        obj.transactTime = toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
+        obj.transactTime = ttc.toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
         return obj;
     }
 
@@ -36,7 +37,7 @@ class TestMessageFactory {
         obj.symbol = symbol
         obj.noRelatedSym = noRelatedSym
 
-        obj.transactTime = toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
+        obj.transactTime = ttc.toEpochMilli(LocalDateTime.of(2022, 7, 3, 17, 11, 3))
         return obj;
     }
 

@@ -1,11 +1,9 @@
 package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import org.junit.Before
 import org.junit.Test
 import quickfix.Message
 import quickfix.field.MsgType
-import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
 /**
@@ -21,6 +19,8 @@ class FixDictionaryTest {
     fun before() {
         dictionary.init()
     }
+
+    private fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
 
     @Test
     fun map() {

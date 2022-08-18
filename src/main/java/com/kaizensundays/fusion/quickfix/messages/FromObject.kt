@@ -1,6 +1,5 @@
 package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import quickfix.FieldMap
 import quickfix.Message
 import java.lang.reflect.Field
@@ -12,6 +11,8 @@ import java.math.BigDecimal
  * @author Sergey Chuykov
  */
 class FromObject(private val dictionary: FixDictionary) {
+
+    private fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
 
     private inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
         val value = field.get(this)

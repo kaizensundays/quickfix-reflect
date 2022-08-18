@@ -16,6 +16,8 @@ import kotlin.test.assertEquals
  */
 class SomeTest {
 
+    private fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
+
     @Test
     fun unmarshalFix() {
 

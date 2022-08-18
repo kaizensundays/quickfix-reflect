@@ -1,6 +1,5 @@
 package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.firstCharToUpper
 import com.kaizensundays.fusion.quickfix.fix44.ComponentType
 import com.kaizensundays.fusion.quickfix.fix44.FieldType
 import com.kaizensundays.fusion.quickfix.fix44.FixType
@@ -25,6 +24,8 @@ class FixDictionary(private val path: String) {
     private var nameToComponentMap: Map<String, ComponentType> = emptyMap()
     private var msgTypeToGroupsMap: Map<String, List<GroupType>> = emptyMap()
     private var msgTypeToGroupTagMap: Map<String, SortedSet<Int>> = emptyMap()
+
+    private fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
 
     fun init() {
 
