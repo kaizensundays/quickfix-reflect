@@ -1,6 +1,5 @@
 package com.kaizensundays.fusion.quickfix.messages
 
-import com.kaizensundays.fusion.quickfix.getValue
 import com.kaizensundays.fusion.quickfix.toEpochMilli
 import com.kaizensundays.fusion.quickfix.toLocalDateTime
 import quickfix.FieldMap
@@ -19,6 +18,13 @@ class TransactTimeConverter(private val dictionary: FixDictionary) : TagConverte
     }
 
     private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
+
+    private inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
+        val value = field.get(this)
+        if (value != null) {
+            set(value)
+        }
+    }
 
     private fun validate(tag: Int) {
         val fixField = dictionary.tagToFieldMap()[tag]

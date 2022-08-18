@@ -1,7 +1,6 @@
 package com.kaizensundays.fusion.quickfix.messages
 
 import com.kaizensundays.fusion.quickfix.firstCharToUpper
-import com.kaizensundays.fusion.quickfix.getValue
 import quickfix.FieldMap
 import quickfix.Message
 import java.lang.reflect.Field
@@ -13,6 +12,13 @@ import java.math.BigDecimal
  * @author Sergey Chuykov
  */
 class FromObject(private val dictionary: FixDictionary) {
+
+    private inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
+        val value = field.get(this)
+        if (value != null) {
+            set(value)
+        }
+    }
 
     private val setCharTag: SetTag = { tag, field, obj, _ ->
         obj.getValue(field) { value -> this.setChar(tag, value as Char) }

@@ -1,6 +1,5 @@
 package com.kaizensundays.fusion.quickfix
 
-import java.lang.reflect.Field
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -23,12 +22,14 @@ fun toEpochMilli(ldt: LocalDateTime): Long {
     return ldt.toInstant(ZoneOffset.UTC).toEpochMilli()
 }
 
+/*
 inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
     val value = field.get(this)
     if (value != null) {
         set(value)
     }
 }
+*/
 
 /*
 val setTransactTimeTag: SetTag = { tag, field, obj, dictionary ->
