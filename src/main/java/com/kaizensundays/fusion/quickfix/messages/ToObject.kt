@@ -4,6 +4,8 @@ import quickfix.FieldMap
 import quickfix.Message
 import quickfix.field.MsgType
 import quickfix.field.converter.CharConverter
+import quickfix.field.converter.DecimalConverter
+import quickfix.field.converter.IntConverter
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.util.function.Supplier
@@ -44,28 +46,20 @@ class ToObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private val setCharField: SetField = { field, tag, msg, _ ->
-        msg.get(tag, field) { value -> field.set(this, CharConverter.convert(value)) }
-    }
-
     private val setStringField: SetField = { field, tag, msg, _ ->
         msg.get(tag, field) { value -> field.set(this, value) }
     }
 
+    private val setCharField: SetField = { field, tag, msg, _ ->
+        msg.get(tag, field) { value -> field.set(this, CharConverter.convert(value)) }
+    }
+
     private val setIntField: SetField = { field, tag, msg, _ ->
-        if (msg.isSetField(tag)) {
-            val value = msg.getInt(tag)
-            if (!field.isFinal()) {
-                field.set(this, value)
-            }
-        }
+        msg.get(tag, field) { value -> field.set(this, IntConverter.convert(value)) }
     }
 
     private val setLongField: SetField = { field, tag, msg, _ ->
-        if (msg.isSetField(tag) && !field.isFinal()) {
-            val value = msg.getDecimal(tag)
-            field.set(this, value.toLong())
-        }
+        msg.get(tag, field) { value -> field.set(this, DecimalConverter.convert(value)) }
     }
 
     private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
