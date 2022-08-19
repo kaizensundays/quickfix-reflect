@@ -12,8 +12,6 @@ import java.math.BigDecimal
  */
 class FromObject(private val dictionary: FixDictionary) {
 
-    private fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
-
     private inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
         val value = field.get(this)
         if (value != null) {
@@ -56,8 +54,6 @@ class FromObject(private val dictionary: FixDictionary) {
         java.lang.Long::class.java to setLongTag,
         java.lang.Double::class.java to setDoubleTag,
     )
-
-    private fun Field.isList() = this.type.equals(List::class.java)
 
     private fun listCopyTo(field: Field, obj: Any, target: FieldMap) {
         val list = field.get(obj)

@@ -22,8 +22,6 @@ class ToObject(private val dictionary: FixDictionary) {
 
     private val classNameToFixGroupMap: MutableMap<String, FixGroup> = mutableMapOf()
 
-    private fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
-
     private fun tag(fieldName: String): Int? {
         val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
         return field?.number?.toInt()
@@ -33,10 +31,6 @@ class ToObject(private val dictionary: FixDictionary) {
         val field = dictionary.tagToFieldMap()[tag]
         return if (field != null) field.type else "?"
     }
-
-    private fun Field.isList() = this.type.equals(List::class.java)
-
-    private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
 
     private inline fun Any.set(field: Field, tag: Int, source: FieldMap, convert: (String) -> Any) {
         if (source.isSetField(tag) && !field.isFinal()) {

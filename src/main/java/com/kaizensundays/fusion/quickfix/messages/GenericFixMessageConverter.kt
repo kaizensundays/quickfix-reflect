@@ -3,6 +3,7 @@ package com.kaizensundays.fusion.quickfix.messages
 import quickfix.FieldMap
 import quickfix.Message
 import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import java.util.function.Supplier
 
 /**
@@ -10,8 +11,16 @@ import java.util.function.Supplier
  *
  * @author Sergey Chuykov
  */
+
 typealias SetTag = FieldMap.(Int, Field, Any, FixDictionary) -> Unit
 typealias SetField = Any.(Field, Int, FieldMap) -> Unit
+
+fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
+
+fun Field.isList() = this.type.equals(List::class.java)
+
+fun Field.isFinal() = Modifier.isFinal(this.modifiers)
+
 
 class GenericFixMessageConverter(private val dictionary: FixDictionary) : ObjectConverter<Message, FixMessage> {
 

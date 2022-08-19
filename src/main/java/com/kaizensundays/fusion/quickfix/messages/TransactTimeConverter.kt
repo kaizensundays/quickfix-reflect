@@ -18,8 +18,6 @@ class TransactTimeConverter(private val dictionary: FixDictionary) : TagConverte
         return "TransactTime"
     }
 
-    private fun Field.isFinal() = Modifier.isFinal(this.modifiers)
-
     private inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
         val value = field.get(this)
         if (value != null) {
