@@ -59,7 +59,7 @@ class FromObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private fun listCopyTo(field: Field, source: Any, target: FieldMap) {
+    private fun setGroups(field: Field, source: Any, target: FieldMap) {
         val list = field.get(source)
         if (list is List<*>) {
             list.filterIsInstance<FixGroup>().forEach { fixGroup ->
@@ -79,19 +79,21 @@ class FromObject(private val dictionary: FixDictionary) {
     fun set(field: Field, source: Any, target: FieldMap) {
         val value = field.get(source)
         if (value != null) {
-            val tag = dictionary.tag(field.name)
-            if (tag != null && !field.isList()) {
-                var setTag = setTagByFieldNameMap[field.name.firstCharToUpper()]
-                if (setTag != null) {
-                    target.setTag(tag, field, source)
-                } else {
-                    setTag = setTagMap[field.type]
+            if (field.isList()) {
+                setGroups(field, source, target)
+            } else {
+                val tag = dictionary.tag(field.name)
+                if (tag != null) {
+                    var setTag = setTagByFieldNameMap[field.name.firstCharToUpper()]
                     if (setTag != null) {
                         target.setTag(tag, field, source)
+                    } else {
+                        setTag = setTagMap[field.type]
+                        if (setTag != null) {
+                            target.setTag(tag, field, source)
+                        }
                     }
                 }
-            } else if (field.isList()) {
-                listCopyTo(field, source, target)
             }
         }
     }
