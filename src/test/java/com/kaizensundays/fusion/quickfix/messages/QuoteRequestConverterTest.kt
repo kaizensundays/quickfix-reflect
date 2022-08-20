@@ -69,11 +69,6 @@ class QuoteRequestConverterTest : GenericFixMessageConverterTestSupport() {
     }
 
     @Test
-    fun hasComponent() {
-        assertTrue(dictionary.hasComponent("instrumentLeg"))
-    }
-
-    @Test
     fun fromObject() {
 
         objs.forEach { obj ->

@@ -25,8 +25,6 @@ class FixDictionary(private val path: String) {
     private var msgTypeToGroupsMap: Map<String, List<GroupType>> = emptyMap()
     private var msgTypeToGroupTagMap: Map<String, SortedSet<Int>> = emptyMap()
 
-    private fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
-
     fun init() {
 
         val resource = ClassPathResource("FIX44.xml")

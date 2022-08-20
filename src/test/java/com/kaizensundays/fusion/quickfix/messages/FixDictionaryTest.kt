@@ -5,6 +5,7 @@ import org.junit.Test
 import quickfix.Message
 import quickfix.field.MsgType
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Created: Saturday 7/2/2022, 12:48 PM Eastern Time
@@ -26,6 +27,11 @@ class FixDictionaryTest {
         assertEquals(916, dictionary.nameToFieldMap().size)
 
         assertEquals(916, dictionary.tagToFieldMap().size)
+    }
+
+    @Test
+    fun hasComponent() {
+        assertTrue(dictionary.hasComponent("instrumentLeg"))
     }
 
 /*
