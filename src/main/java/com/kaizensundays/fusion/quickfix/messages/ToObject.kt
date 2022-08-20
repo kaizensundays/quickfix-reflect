@@ -130,14 +130,9 @@ class ToObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private fun tag(fieldName: String): Int? {
-        val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
-        return field?.number?.toInt()
-    }
-
     private fun set(source: FieldMap, field: Field, target: Any) {
 
-        val tag = tag(field.name)
+        val tag = dictionary.tag(field.name)
         if (tag != null) {
             if (field.isList()) {
                 setGroups(source, tag, field, target)
