@@ -67,9 +67,11 @@ class FixDictionary(private val path: String) {
         return tagToFieldMap
     }
 
+/*
     fun nameToComponentMap(): Map<String, ComponentType> {
         return nameToComponentMap
     }
+*/
 
     fun hasComponent(name: String): Boolean {
         return nameToComponentMap.containsKey(name.firstCharToUpper())
