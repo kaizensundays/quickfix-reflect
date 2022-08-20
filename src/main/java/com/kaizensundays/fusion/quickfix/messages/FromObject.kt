@@ -76,24 +76,28 @@ class FromObject(private val dictionary: FixDictionary) {
         }
     }
 
+    private fun setField(field: Field, source: Any, target: FieldMap) {
+        val tag = dictionary.tag(field.name)
+        if (tag != null) {
+            var setTag = setTagByFieldNameMap[field.name.firstCharToUpper()]
+            if (setTag != null) {
+                target.setTag(tag, field, source)
+            } else {
+                setTag = setTagMap[field.type]
+                if (setTag != null) {
+                    target.setTag(tag, field, source)
+                }
+            }
+        }
+    }
+
     fun set(field: Field, source: Any, target: FieldMap) {
         val value = field.get(source)
         if (value != null) {
             if (field.isList()) {
                 setGroups(field, source, target)
             } else {
-                val tag = dictionary.tag(field.name)
-                if (tag != null) {
-                    var setTag = setTagByFieldNameMap[field.name.firstCharToUpper()]
-                    if (setTag != null) {
-                        target.setTag(tag, field, source)
-                    } else {
-                        setTag = setTagMap[field.type]
-                        if (setTag != null) {
-                            target.setTag(tag, field, source)
-                        }
-                    }
-                }
+                setField(field, source, target)
             }
         }
     }
