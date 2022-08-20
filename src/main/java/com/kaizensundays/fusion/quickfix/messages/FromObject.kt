@@ -23,32 +23,24 @@ class FromObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private val setCharTag: SetTag = { tag, field, obj, _ ->
+    private val setCharTag: SetTag = { tag, field, obj ->
         this.set(tag, field, obj) { value -> CharConverter.convert(value as Char) }
     }
 
-    private val setStringTag: SetTag = { tag, field, obj, _ ->
+    private val setStringTag: SetTag = { tag, field, obj ->
         this.set(tag, field, obj) { value -> value as String }
     }
 
-    private val setIntTag: SetTag = { tag, field, obj, _ ->
+    private val setIntTag: SetTag = { tag, field, obj ->
         this.set(tag, field, obj) { value -> IntConverter.convert(value as Int) }
     }
 
-    private val setLongTag: SetTag = { tag, field, obj, _ ->
+    private val setLongTag: SetTag = { tag, field, obj ->
         this.set(tag, field, obj) { value -> DecimalConverter.convert(BigDecimal.valueOf(value as Long)) }
     }
 
-    private val setDoubleTag: SetTag = { tag, field, obj, _ ->
+    private val setDoubleTag: SetTag = { tag, field, obj ->
         this.set(tag, field, obj) { value -> DoubleConverter.convert(value as Double) }
-    }
-
-    private val setTagByFieldNameMap: MutableMap<String, SetTag> = mutableMapOf()
-
-    fun register(converter: TagConverter) {
-        setTagByFieldNameMap[converter.getTagName()] = { tag, field, source, dictionary ->
-            converter.setTag(source, field, this, tag)
-        }
     }
 
     private val setTagMap: Map<Class<*>, SetTag> = mapOf(
@@ -58,6 +50,14 @@ class FromObject(private val dictionary: FixDictionary) {
         java.lang.Long::class.java to setLongTag,
         java.lang.Double::class.java to setDoubleTag,
     )
+
+    private val setTagByFieldNameMap: MutableMap<String, SetTag> = mutableMapOf()
+
+    fun register(converter: TagConverter) {
+        setTagByFieldNameMap[converter.getTagName()] = { tag, field, source ->
+            converter.setTag(source, field, this, tag)
+        }
+    }
 
     private fun listCopyTo(field: Field, obj: Any, target: FieldMap) {
         val list = field.get(obj)
@@ -83,11 +83,11 @@ class FromObject(private val dictionary: FixDictionary) {
             if (tag != null && !field.isList()) {
                 var setTag = setTagByFieldNameMap[field.name.firstCharToUpper()]
                 if (setTag != null) {
-                    target.setTag(tag, field, obj, dictionary)
+                    target.setTag(tag, field, obj)
                 } else {
                     setTag = setTagMap[field.type]
                     if (setTag != null) {
-                        target.setTag(tag, field, obj, dictionary)
+                        target.setTag(tag, field, obj)
                     }
                 }
             } else if (field.isList()) {

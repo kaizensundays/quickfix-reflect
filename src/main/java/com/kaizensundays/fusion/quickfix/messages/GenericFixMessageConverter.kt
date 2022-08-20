@@ -12,7 +12,7 @@ import java.util.function.Supplier
  * @author Sergey Chuykov
  */
 
-typealias SetTag = FieldMap.(Int, Field, Any, FixDictionary) -> Unit
+typealias SetTag = FieldMap.(Int, Field, Any) -> Unit
 typealias SetField = Any.(Field, Int, FieldMap) -> Unit
 
 fun String.firstCharToUpper() = replaceFirstChar { c -> c.uppercase() }
