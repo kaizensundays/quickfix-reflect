@@ -93,11 +93,6 @@ class ToObject(private val dictionary: FixDictionary) {
         classNameToFixGroupMap.putAll(map)
     }
 
-    private fun tag(fieldName: String): Int? {
-        val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
-        return field?.number?.toInt()
-    }
-
     private fun Field.getGroups(obj: Any): MutableList<Any> {
         var list = this.get(obj)
         if (list == null) {
@@ -141,6 +136,11 @@ class ToObject(private val dictionary: FixDictionary) {
                 target.setField(field, tag, source)
             }
         }
+    }
+
+    private fun tag(fieldName: String): Int? {
+        val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
+        return field?.number?.toInt()
     }
 
     private fun set(source: FieldMap, field: Field, target: Any) {
