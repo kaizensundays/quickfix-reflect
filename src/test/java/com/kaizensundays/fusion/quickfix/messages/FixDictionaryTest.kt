@@ -48,6 +48,7 @@ class FixDictionaryTest {
     }
 */
 
+/*
     @Test
     fun javaType() {
 
@@ -68,5 +69,6 @@ class FixDictionaryTest {
         }
 
     }
+*/
 
 }
