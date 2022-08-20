@@ -69,14 +69,14 @@ class FromObject(private val dictionary: FixDictionary) {
                 }
                 val fields = fixGroup.javaClass.declaredFields
                 fields.forEach { field ->
-                    fieldCopyTo(field, fixGroup, group)
+                    set(field, fixGroup, group)
                 }
                 target.addGroup(group)
             }
         }
     }
 
-    fun fieldCopyTo(field: Field, source: Any, target: FieldMap) {
+    fun set(field: Field, source: Any, target: FieldMap) {
         val value = field.get(source)
         if (value != null) {
             val tag = dictionary.tag(field.name)
@@ -101,11 +101,11 @@ class FromObject(private val dictionary: FixDictionary) {
         val msg = Message()
 
         FixMessage::class.java.declaredFields.forEach { field ->
-            fieldCopyTo(field, obj, msg.header)
+            set(field, obj, msg.header)
         }
 
         obj.javaClass.declaredFields.forEach { field ->
-            fieldCopyTo(field, obj, msg)
+            set(field, obj, msg)
         }
 
         return msg

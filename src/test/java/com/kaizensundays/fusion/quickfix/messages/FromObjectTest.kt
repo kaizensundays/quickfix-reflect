@@ -85,7 +85,7 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
         val msg = Message()
 
         FixMessage::class.java.declaredFields.forEach { f ->
-            fo.fieldCopyTo(f, obj, msg)
+            fo.set(f, obj, msg)
         }
 
         assertEquals(MsgType.ORDER_SINGLE, msg.getString(MsgType.FIELD))
@@ -93,7 +93,7 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
         assertEquals(obj.targetCompID, msg.getString(TargetCompID.FIELD))
 
         NewOrderSingle::class.java.declaredFields.forEach { f ->
-            fo.fieldCopyTo(f, obj, msg)
+            fo.set(f, obj, msg)
         }
 
         assertEquals(obj.side, msg.getChar(Side.FIELD))
@@ -111,7 +111,7 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
         val msg = Message()
 
         FixMessage::class.java.declaredFields.forEach { f ->
-            fo.fieldCopyTo(f, obj, msg)
+            fo.set(f, obj, msg)
         }
 
         assertEquals(MsgType.QUOTE_REQUEST, msg.getString(MsgType.FIELD))
@@ -119,7 +119,7 @@ class FromObjectTest : GenericFixMessageConverterTestSupport() {
         assertEquals(obj.targetCompID, msg.getString(TargetCompID.FIELD))
 
         QuoteRequest::class.java.declaredFields.forEach { f ->
-            fo.fieldCopyTo(f, obj, msg)
+            fo.set(f, obj, msg)
         }
 
         assertEquals(obj.quoteReqID, msg.getString(QuoteReqID.FIELD))
