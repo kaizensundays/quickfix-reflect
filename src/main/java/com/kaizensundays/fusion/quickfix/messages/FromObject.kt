@@ -59,8 +59,8 @@ class FromObject(private val dictionary: FixDictionary) {
         }
     }
 
-    private fun listCopyTo(field: Field, obj: Any, target: FieldMap) {
-        val list = field.get(obj)
+    private fun listCopyTo(field: Field, source: Any, target: FieldMap) {
+        val list = field.get(source)
         if (list is List<*>) {
             list.filterIsInstance<FixGroup>().forEach { fixGroup ->
                 val group = fixGroup.createQuickFixGroup()
@@ -76,27 +76,28 @@ class FromObject(private val dictionary: FixDictionary) {
         }
     }
 
-    fun fieldCopyTo(field: Field, obj: Any, target: FieldMap) {
-        val value = field.get(obj)
+    fun fieldCopyTo(field: Field, source: Any, target: FieldMap) {
+        val value = field.get(source)
         if (value != null) {
             val tag = dictionary.tag(field.name)
             if (tag != null && !field.isList()) {
                 var setTag = setTagByFieldNameMap[field.name.firstCharToUpper()]
                 if (setTag != null) {
-                    target.setTag(tag, field, obj)
+                    target.setTag(tag, field, source)
                 } else {
                     setTag = setTagMap[field.type]
                     if (setTag != null) {
-                        target.setTag(tag, field, obj)
+                        target.setTag(tag, field, source)
                     }
                 }
             } else if (field.isList()) {
-                listCopyTo(field, obj, target)
+                listCopyTo(field, source, target)
             }
         }
     }
 
     fun fromObject(obj: FixMessage): Message {
+
         val msg = Message()
 
         FixMessage::class.java.declaredFields.forEach { field ->
