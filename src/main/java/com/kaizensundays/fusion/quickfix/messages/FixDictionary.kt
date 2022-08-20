@@ -65,12 +65,6 @@ class FixDictionary(private val path: String) {
         return tagToFieldMap
     }
 
-/*
-    fun nameToComponentMap(): Map<String, ComponentType> {
-        return nameToComponentMap
-    }
-*/
-
     fun hasComponent(name: String): Boolean {
         return nameToComponentMap.containsKey(name.firstCharToUpper())
     }
@@ -87,18 +81,5 @@ class FixDictionary(private val path: String) {
     fun fixType(tag: Int): String {
         return getField(tag)?.type ?: "?"
     }
-
-/*
-    fun getGroupTags(msg: Message): Set<Int> {
-        if (msg.header.isSetField(MsgType.FIELD)) {
-            val msgType = msg.header.getString(MsgType.FIELD)
-            val tags = msgTypeToGroupTagMap[msgType]
-            if (tags != null) {
-                return tags
-            }
-        }
-        return emptySet()
-    }
-*/
 
 }
