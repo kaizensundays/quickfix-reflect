@@ -9,6 +9,6 @@ interface ObjectConverter<T, O> {
 
     fun fromObject(obj: O): T
 
-    fun toObject(obj: T): O
+    fun toObject(msg: T): O
 
 }
