@@ -17,14 +17,6 @@ import java.util.function.Supplier
  */
 class ToObject(private val dictionary: FixDictionary) {
 
-
-/*
-    fun fixType(tag: Int): String {
-        val field = dictionary.tagToFieldMap()[tag]
-        return if (field != null) field.type else "?"
-    }
-*/
-
     private inline fun Any.set(field: Field, tag: Int, source: FieldMap, convert: (String) -> Any) {
         if (source.isSetField(tag) && !field.isFinal()) {
             val value = source.getString(tag)
