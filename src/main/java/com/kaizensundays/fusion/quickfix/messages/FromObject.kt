@@ -2,6 +2,10 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import quickfix.FieldMap
 import quickfix.Message
+import quickfix.field.converter.CharConverter
+import quickfix.field.converter.DecimalConverter
+import quickfix.field.converter.DoubleConverter
+import quickfix.field.converter.IntConverter
 import java.lang.reflect.Field
 import java.math.BigDecimal
 
@@ -12,31 +16,31 @@ import java.math.BigDecimal
  */
 class FromObject(private val dictionary: FixDictionary) {
 
-    private inline fun Any.getValue(field: Field, set: (Any) -> Unit) {
-        val value = field.get(this)
+    private inline fun FieldMap.set(tag: Int, field: Field, source: Any, convert: (Any) -> String) {
+        val value = field.get(source)
         if (value != null) {
-            set(value)
+            this.setString(tag, convert.invoke(value))
         }
     }
 
     private val setCharTag: SetTag = { tag, field, obj, _ ->
-        obj.getValue(field) { value -> this.setChar(tag, value as Char) }
+        this.set(tag, field, obj) { value -> CharConverter.convert(value as Char) }
     }
 
     private val setStringTag: SetTag = { tag, field, obj, _ ->
-        obj.getValue(field) { value -> this.setString(tag, value as String) }
+        this.set(tag, field, obj) { value -> value as String }
     }
 
     private val setIntTag: SetTag = { tag, field, obj, _ ->
-        obj.getValue(field) { value -> this.setInt(tag, value as Int) }
+        this.set(tag, field, obj) { value -> IntConverter.convert(value as Int) }
     }
 
     private val setLongTag: SetTag = { tag, field, obj, _ ->
-        obj.getValue(field) { value -> this.setDecimal(tag, BigDecimal.valueOf(value as Long)) }
+        this.set(tag, field, obj) { value -> DecimalConverter.convert(BigDecimal.valueOf(value as Long)) }
     }
 
     private val setDoubleTag: SetTag = { tag, field, obj, _ ->
-        obj.getValue(field) { value -> this.setDouble(tag, value as Double) }
+        this.set(tag, field, obj) { value -> DoubleConverter.convert(value as Double) }
     }
 
     private val setTagByFieldNameMap: MutableMap<String, SetTag> = mutableMapOf()
