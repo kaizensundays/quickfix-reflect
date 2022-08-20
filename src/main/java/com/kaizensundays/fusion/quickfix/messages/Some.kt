@@ -7,9 +7,4 @@ package com.kaizensundays.fusion.quickfix.messages
  */
 class Some(private val dictionary: FixDictionary) {
 
-    fun fixType(tag: Int): String {
-        val field = dictionary.tagToFieldMap()[tag]
-        return if (field != null) field.type else "?"
-    }
-
 }

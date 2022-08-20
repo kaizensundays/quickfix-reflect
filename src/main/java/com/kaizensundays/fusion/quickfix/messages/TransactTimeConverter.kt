@@ -2,7 +2,6 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import quickfix.FieldMap
 import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -36,8 +35,7 @@ class TransactTimeConverter(private val dictionary: FixDictionary) : TagConverte
     }
 
     private fun validate(tag: Int) {
-        val fixField = dictionary.tagToFieldMap()[tag]
-        if ("UTCTIMESTAMP" != fixField?.type) {
+        if ("UTCTIMESTAMP" != dictionary.fixType(tag)) {
             throw IllegalArgumentException()
         }
     }

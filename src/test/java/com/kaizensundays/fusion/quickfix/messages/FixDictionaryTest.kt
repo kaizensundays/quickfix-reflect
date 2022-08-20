@@ -2,8 +2,6 @@ package com.kaizensundays.fusion.quickfix.messages
 
 import org.junit.Before
 import org.junit.Test
-import quickfix.Message
-import quickfix.field.MsgType
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -32,6 +30,28 @@ class FixDictionaryTest {
     @Test
     fun hasComponent() {
         assertTrue(dictionary.hasComponent("instrumentLeg"))
+    }
+
+    @Test
+    fun getField() {
+
+        val data = listOf(35, 54, 60, 200)
+            .zip(
+                listOf(
+                    "MsgType" to "STRING",
+                    "Side" to "CHAR",
+                    "TransactTime" to "UTCTIMESTAMP",
+                    "MaturityMonthYear" to "MONTHYEAR",
+                )
+            )
+
+        data.forEach { (tag, field) ->
+
+            val f = dictionary.getField(tag)
+            assertEquals(field.first, f?.name)
+            assertEquals(field.second, f?.type)
+        }
+
     }
 
 /*

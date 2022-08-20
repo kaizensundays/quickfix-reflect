@@ -5,8 +5,6 @@ import com.kaizensundays.fusion.quickfix.fix44.FieldType
 import com.kaizensundays.fusion.quickfix.fix44.FixType
 import com.kaizensundays.fusion.quickfix.fix44.GroupType
 import org.springframework.core.io.ClassPathResource
-import quickfix.Message
-import quickfix.field.MsgType
 import java.io.FileInputStream
 import java.util.*
 import javax.xml.bind.JAXBContext
@@ -80,6 +78,14 @@ class FixDictionary(private val path: String) {
     fun tag(fieldName: String): Int? {
         val field = nameToFieldMap[fieldName.firstCharToUpper()]
         return field?.number?.toInt()
+    }
+
+    fun getField(tag: Int): FieldType? {
+        return tagToFieldMap[tag]
+    }
+
+    fun fixType(tag: Int): String {
+        return getField(tag)?.type ?: "?"
     }
 
 /*
