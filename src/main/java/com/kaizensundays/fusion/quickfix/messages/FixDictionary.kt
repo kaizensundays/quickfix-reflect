@@ -82,6 +82,7 @@ class FixDictionary(private val path: String) {
         return field?.number?.toInt()
     }
 
+/*
     fun getGroupTags(msg: Message): Set<Int> {
         if (msg.header.isSetField(MsgType.FIELD)) {
             val msgType = msg.header.getString(MsgType.FIELD)
@@ -92,5 +93,6 @@ class FixDictionary(private val path: String) {
         }
         return emptySet()
     }
+*/
 
 }

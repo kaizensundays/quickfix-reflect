@@ -30,6 +30,7 @@ class FixDictionaryTest {
         assertEquals(916, dictionary.tagToFieldMap().size)
     }
 
+/*
     fun message(msgType: String): Message {
         val msg = Message()
         msg.header.setString(MsgType.FIELD, msgType)
@@ -47,6 +48,7 @@ class FixDictionaryTest {
         assertEquals(sortedSetOf(78, 386, 555, 711), dictionary.getGroupTags(message(MsgType.NEW_ORDER_MULTILEG)).toSortedSet())
         assertEquals(sortedSetOf(146), dictionary.getGroupTags(message(MsgType.QUOTE_REQUEST)).toSortedSet())
     }
+*/
 
     @Test
     fun javaType() {
