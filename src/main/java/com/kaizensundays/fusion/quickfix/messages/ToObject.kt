@@ -8,7 +8,6 @@ import quickfix.field.converter.DecimalConverter
 import quickfix.field.converter.DoubleConverter
 import quickfix.field.converter.IntConverter
 import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 import java.util.function.Supplier
 
 /**
@@ -18,19 +17,13 @@ import java.util.function.Supplier
  */
 class ToObject(private val dictionary: FixDictionary) {
 
-    private val msgTypeToJavaTypeMap: MutableMap<String, Supplier<FixMessage>> = mutableMapOf()
 
-    private val classNameToFixGroupMap: MutableMap<String, FixGroup> = mutableMapOf()
-
-    private fun tag(fieldName: String): Int? {
-        val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
-        return field?.number?.toInt()
-    }
-
+/*
     fun fixType(tag: Int): String {
         val field = dictionary.tagToFieldMap()[tag]
         return if (field != null) field.type else "?"
     }
+*/
 
     private inline fun Any.set(field: Field, tag: Int, source: FieldMap, convert: (String) -> Any) {
         if (source.isSetField(tag) && !field.isFinal()) {
@@ -61,24 +54,25 @@ class ToObject(private val dictionary: FixDictionary) {
         set(field, tag, msg) { value -> DoubleConverter.convert(value) }
     }
 
+    private val setFieldMap: Map<Class<*>, SetField> = mapOf(
+        Character::class.java to setCharField,
+        String::class.java to setStringField,
+        Integer::class.java to setIntField,
+        java.lang.Long::class.java to setLongField,
+        java.lang.Double::class.java to setDoubleField,
+    )
+
+    private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
+
     fun register(converter: TagConverter) {
         setFieldByFieldNameMap[converter.getTagName()] = { tag, field, source ->
             converter.setField(source, field, this, tag)
         }
     }
 
-    private val setFieldByFieldNameMap: MutableMap<String, SetField> = mutableMapOf()
+    private val msgTypeToJavaTypeMap: MutableMap<String, Supplier<FixMessage>> = mutableMapOf()
 
-    fun register(factory: Supplier<FixMessage>) {
-
-        val msg = factory.get()
-
-        msgTypeToJavaTypeMap[msg.msgType] = factory
-
-        val map = findFixGroups(msg.javaClass)
-        classNameToFixGroupMap.putAll(map)
-
-    }
+    private val classNameToFixGroupMap: MutableMap<String, FixGroup> = mutableMapOf()
 
     fun findFixGroups(type: Class<out Any>, map: Map<String, FixGroup> = emptyMap()): Map<String, FixGroup> {
 
@@ -89,14 +83,20 @@ class ToObject(private val dictionary: FixDictionary) {
             }
     }
 
+    fun register(factory: Supplier<FixMessage>) {
 
-    private val setFieldMap: Map<Class<*>, SetField> = mapOf(
-        Character::class.java to setCharField,
-        String::class.java to setStringField,
-        Integer::class.java to setIntField,
-        java.lang.Long::class.java to setLongField,
-        java.lang.Double::class.java to setDoubleField,
-    )
+        val msg = factory.get()
+
+        msgTypeToJavaTypeMap[msg.msgType] = factory
+
+        val map = findFixGroups(msg.javaClass)
+        classNameToFixGroupMap.putAll(map)
+    }
+
+    private fun tag(fieldName: String): Int? {
+        val field = dictionary.nameToFieldMap()[fieldName.firstCharToUpper()]
+        return field?.number?.toInt()
+    }
 
     private fun Field.getGroups(obj: Any): MutableList<Any> {
         var list = this.get(obj)
